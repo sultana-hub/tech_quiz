@@ -9,5 +9,6 @@ export const endPoints = {
   resendOtp:"api/user/resend/otp",
   startQuiz:"api/quiz/start",
   submitAnswer:"api/answer/create",
-  quizResult:"/api/quiz/result"
+  quizResult:"api/quiz/result",
+  categories:"api/categories"
 };

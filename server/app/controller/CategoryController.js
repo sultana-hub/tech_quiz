@@ -3,7 +3,7 @@ const httpStatusCode = require("../helper/httpStatusCode");
 const CategoryModel = require("../model/category");
 const fs = require('fs').promises
 const path = require('path')
-const mongoose=require('mongoose')
+const mongoose = require('mongoose')
 class CategoryController {
 
     async createCategory(req, res) {
@@ -37,6 +37,39 @@ class CategoryController {
             });
         }
     }
+
+
+    async getAllCategory(req, res) {
+        try {
+            // Fetch all categories from the database
+            const categories = await CategoryModel.find({});
+
+            // If no categories found 
+            if (!categories.length) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'No categories found',
+                    data: []
+                });
+            }
+
+            // Successful response
+            return res.status(200).json({
+                success: true,
+                message: 'Categories retrieved successfully',
+                data: categories
+            });
+
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Internal server error while fetching categories',
+                error: process.env.NODE_ENV === 'development' ? error.message : undefined
+            });
+        }
+    }
+
 
 
     async updateCategory(req, res) {

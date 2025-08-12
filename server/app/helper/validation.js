@@ -19,10 +19,27 @@ const categoryValidation = Joi.object({
 })
 
 
+// const answerValidation = Joi.object({
+//   selectedAnswer: Joi.string().required().trim()
+// //   timeZone: Joi.string().required().trim(),
+// });
+
+
+
+
 const answerValidation = Joi.object({
-  selectedAnswer: Joi.string().required().trim()
-//   timeZone: Joi.string().required().trim(),
+    // questionId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required().messages({
+    //     'string.pattern.base': 'Invalid question ID format',
+    //     'any.required': 'Question ID is required',
+    // }),
+    selectedAnswer: Joi.string().required().messages({
+        'any.required': 'Selected answer is required',
+    }),
+    timeZone: Joi.string().required().messages({
+        'any.required': 'Time zone is required',
+    }),
 });
 
+module.exports = { answerValidation };
 
 module.exports = { questionValidation, categoryValidation,answerValidation }

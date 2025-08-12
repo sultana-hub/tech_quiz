@@ -65,7 +65,7 @@ const EditProfile = () => {
     };
 
     return (
-        <Container maxWidth="md" sx={{ mb: 4 }}>
+        <Container maxWidth="md" sx={{ mb: 25 }}>
             <Typography variant="h4" gutterBottom sx={{ mt: 4 }} color="primary">
                 Edit Your Profile
             </Typography>

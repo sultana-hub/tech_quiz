@@ -21,7 +21,7 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#333' }}>
+    <AppBar position="static" sx={{ backgroundColor: '#2c2929ff' }}>
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Box display="flex" alignItems="center">
           <CodeIcon sx={{ mr: 1 }} />

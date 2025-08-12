@@ -1,5 +1,4 @@
 
-
 const QuestionModel = require('../model/question');
 const { answerValidation } = require('../helper/validation');
 const httpStatusCode = require('../helper/httpStatusCode')
@@ -7,18 +6,16 @@ const { ObjectId } = require('mongoose').Types;
 const mongoose = require('mongoose');
 class UserAndAnswerController {
   // creating answer
-
-
   async createAnswer(req, res) {
     try {
       const userId = req.user._id;
-      const { questionId, selectedAnswer } = req.body;
+      const { questionId, selectedAnswer,timeZone } = req.body;
 
       // Get timeZone from session (optional fallback)
-      const timeZone = req.session?.timeZone || "UTC";
+      // const timeZone = req.session?.timeZone || "UTC";
 
       // Validate only selectedAnswer
-      const { error } = answerValidation.validate({ selectedAnswer });
+      const { error } = answerValidation.validate({ selectedAnswer ,timeZone});
       if (error) {
         return res.status(400).json({ status: false, message: error.message });
       }
@@ -70,37 +67,97 @@ class UserAndAnswerController {
   }
 
 
-
-
   async quizStart(req, res) {
-    const { timeZone } = req.body;
-    req.session.timeZone = timeZone;
+    try {
+      const { timeZone, categoryName } = req.body;
 
-    if (!timeZone) {
-      return res.status(400).json({ status: false, message: 'Time zone required' });
-    }
-
-    // Save time zone in session or DB (optional), then send questions
-    const questions = await QuestionModel.aggregate([
-      { $match: {} },
-      {
-        $project: {
-          question: 1,
-          options: 1,
-          duration: 1,
-          categoryIds: 1,
-        }
+      if (!timeZone || !categoryName) {
+        return res.status(400).json({
+          status: false,
+          message: 'Time zone and category name are required'
+        });
       }
-    ]);
 
-    return res.status(200).json({
-      status: true,
-      message: 'Quiz started',
-      timeZone,
-      questions
-    });
+      req.session.timeZone = timeZone;
 
+      const result = await QuestionModel.aggregate([
+        {
+          $lookup: {
+            from: "categories",
+            localField: "categoryIds",
+            foreignField: "_id",
+            as: "categoryData"
+          }
+        },
+        { $unwind: "$categoryData" },
+        {
+          $match: {
+            "categoryData.categoryName": { $regex: categoryName, $options: 'i' }  // from req.body
+          }
+        },
+        {
+          $group: {
+            _id: "$categoryData._id",
+            categoryName: { $first: "$categoryData.categoryName" },
+            questions: {
+              $push: {
+                 _id: '$_id', // question ID
+                question: "$question",
+                options: "$options",
+                correctAnswer: "$correctAnswer",
+                duration: "$duration"
+              }
+            }
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            categoryName: 1,
+            questions: 1
+          }
+        }
+      ]);
+
+      if (!result.length) {
+        return res.status(404).json({
+          status: false,
+          message: "No questions found for this category",
+          data: []
+        });
+      }
+
+      res.json({
+        status: true,
+        message: "Quiz started",
+        timeZone: req.body.timeZone,
+        categoryName: result[0].categoryName,
+        questions: result[0].questions
+      });
+
+
+      if (!questions.length) {
+        return res.status(404).json({
+          status: false,
+          message: 'No questions found for this category'
+        });
+      }
+
+      return res.status(200).json({
+        status: true,
+        message: 'Quiz started',
+        timeZone,
+        questions
+      });
+
+    } catch (error) {
+      return res.status(500).json({
+        status: false,
+        message: error.message
+      });
+    }
   }
+
 
   async getUserQuizAnswers(req, res) {
     try {

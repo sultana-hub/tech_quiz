@@ -8,7 +8,7 @@ const Footer = () => {
       component="footer"
       
       sx={{
-        backgroundColor: '#1f1f1f',
+        backgroundColor: '#2c2929ff',
         color: '#fff',
         py: 2,
         textAlign: 'center',
