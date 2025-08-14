@@ -23,19 +23,21 @@ const QuizResult = () => {
         error,
     } = useQuery({
         queryFn: fetchQuizResults,
-        queryKey: ['result']
+        queryKey: ['result'],
+        staleTime: 0, // Always fetch fresh
+        cacheTime: 0, // No cache storage
 
     });
 
-  const groupByCategory = (results) => {
-    return results.reduce((acc, curr) => {
-        if (!curr.categoryName) return acc; //  Just skip, don't return null
-        const category = curr.categoryName;
-        if (!acc[category]) acc[category] = [];
-        acc[category].push(curr);
-        return acc;
-    }, {});
-};
+    const groupByCategory = (results) => {
+        return results.reduce((acc, curr) => {
+            if (!curr.categoryName) return acc; //  Just skip, don't return null
+            const category = curr.categoryName;
+            if (!acc[category]) acc[category] = [];
+            acc[category].push(curr);
+            return acc;
+        }, {});
+    };
 
     const [subjectPage, setSubjectPage] = useState(0); // tracks category index
 

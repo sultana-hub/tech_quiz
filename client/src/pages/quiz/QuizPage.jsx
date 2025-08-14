@@ -1,7 +1,8 @@
 
 
-import { useState, useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
+
+import { useState, useEffect, useRef } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     Box,
     Typography,
@@ -15,29 +16,36 @@ import { useNavigate } from 'react-router-dom';
 
 const QuizPage = () => {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [questions, setQuestions] = useState([]);
     const [answers, setAnswers] = useState({});
     const [totalTime, setTotalTime] = useState(0);
-    const [timeLeft, setTimeLeft] = useState(0);
+    const [timeLeft, setTimeLeft] = useState(null);
     const timeZone = localStorage.getItem('timeZone');
     const subject = localStorage.getItem('subject');
 
+    const timerIdRef = useRef(null);
+    const submittingRef = useRef(false);
+
     const submitAnswerMutation = useMutation({
         mutationFn: submitAnswer,
-        onSuccess: (res) => console.log('Answer submitted:', res.data),
+        onSuccess: (res) => {
+            console.log('Answer submitted:', res.data)
+            queryClient.invalidateQueries(["result"]);
+        },
         onError: (err) => console.error('Error submitting answer:', err),
     });
 
-    // Load questions
+    // Load questions and set initial timer
     useEffect(() => {
         const data = JSON.parse(localStorage.getItem('quizData'));
         console.log('quizData from localStorage:', data);
+
         if (data && data.length > 0) {
-            // Give each question a stable ID if backend didn't send one
             const enrichedData = data.map((q, idx) => ({
                 ...q,
-                localId: q._id || `local-${idx}`, // keep backend _id if available
+                localId: q._id || `local-${idx}`,
             }));
 
             setQuestions(enrichedData);
@@ -48,44 +56,43 @@ const QuizPage = () => {
             }, 0);
 
             setTotalTime(totalDuration);
-            setTimeLeft(totalDuration);
+            setTimeLeft(totalDuration); // ⏳ start fresh timer
         }
     }, []);
 
-    // Global quiz timer countdown
+    // Timer countdown effect
     useEffect(() => {
-        if (questions.length === 0 || timeLeft === null || timeLeft <= 0 || hasSubmitted) return;
+        if (timeLeft === null || hasSubmitted) return;
 
-        const timer = setTimeout(() => {
-            setTimeLeft((prev) => prev - 1);
-        }, 1000);
-
-        return () => clearTimeout(timer);
-    }, [timeLeft, questions, hasSubmitted]);
-
-    //handle auto submisstion at time 0
-    useEffect(() => {
-        if (timeLeft === 0 && questions.length > 0 && !hasSubmitted) {
+        if (timeLeft > 0) {
+            timerIdRef.current = setTimeout(() => {
+                setTimeLeft(prev => prev - 1);
+            }, 1000);
+        } else if (timeLeft === 0 && !submittingRef.current) {
             console.log("⏰ Timer hit 0. Submitting automatically...");
-            handleSubmitQuiz(true); // call with timeout flag
+            handleSubmitQuiz(true);
         }
-    }, [timeLeft, questions, hasSubmitted]);
 
+        return () => clearTimeout(timerIdRef.current);
+    }, [timeLeft, hasSubmitted]);
 
     const handleOptionChange = (questionId, option) => {
-        setAnswers((prev) => {
-            console.log('Previous answers:', prev);
-            const newAnswers = { ...prev, [questionId]: option };
-            console.log('New answers:', newAnswers);
-            return newAnswers;
-        });
+        setAnswers((prev) => ({ ...prev, [questionId]: option }));
     };
 
     const handleSubmitQuiz = async (isTimeout = false) => {
-        if (hasSubmitted) return;
+        // prevent double execution
+        if (hasSubmitted || submittingRef.current) return;
+        submittingRef.current = true;
+
+        clearTimeout(timerIdRef.current);
+        setHasSubmitted(true);
+        setTimeLeft(null);
+
+        // submit each answer
         for (const question of questions) {
             const selectedAnswer = answers[question._id];
-            if (selectedAnswer) { // Only submit if an answer exists
+            if (selectedAnswer) {
                 await submitAnswerMutation.mutateAsync({
                     questionId: question._id,
                     selectedAnswer,
@@ -93,17 +100,19 @@ const QuizPage = () => {
                 });
             }
         }
-        setHasSubmitted(true);
+
+
+        // Invalidate cache so result page gets fresh data
+        queryClient.invalidateQueries({ queryKey: ['result'] });
+        // feedback
         if (isTimeout) {
-            alert('⏰ Time’s up! Quiz submitted automatically.');
+            alert("⏰ Time’s up! Quiz submitted automatically.");
         } else {
-            alert(' Quiz submitted successfully.');
+            alert("✅ Quiz submitted successfully.");
         }
-        navigate('/quiz-result');
+
+        navigate("/quiz-result");
     };
-
-
-
 
     if (!questions.length) return <Typography>Loading Quiz...</Typography>;
 
@@ -141,7 +150,7 @@ const QuizPage = () => {
 
                 <Button
                     variant="contained"
-                    onClick={handleSubmitQuiz}
+                    onClick={() => handleSubmitQuiz(false)}
                     disabled={Object.keys(answers).length !== questions.length}
                 >
                     Submit Quiz
@@ -152,4 +161,3 @@ const QuizPage = () => {
 };
 
 export default QuizPage;
-
