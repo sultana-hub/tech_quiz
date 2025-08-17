@@ -15,7 +15,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 import OtpVerification from '../pages/auth/OtpVerification'
 import StartQuiz from '../pages/quiz/StartQuiz';
 import QuizPage from '../pages/quiz/QuizPage';
-import QuizResult from '../pages/quiz/QuizResult'
+import QuizResult from '../pages/quiz/QuizResult';
+import ForgetPassword from '../pages/auth/ForgetPassword'
+import AboutUs from '../pages/AboutUs';
 const ErrorPage = lazy(() => {
   return new Promise((resolve) => {
     setTimeout(() => resolve(import("../pages/ErrorPage"))
@@ -41,6 +43,8 @@ const Router = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/otp" element={<OtpVerification />} />
+          <Route path="/password-forget" element={<ForgetPassword/>}/>
+          <Route path="/about"element={<AboutUs/>}/>
           {/* protected route */}
           <Route element={<ProtectedRoute />}>
             {/* user profile */}

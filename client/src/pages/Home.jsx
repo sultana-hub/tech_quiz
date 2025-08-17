@@ -12,7 +12,7 @@ const Home = () => {
           minHeight: '100vh',
           width: '100%',
           backgroundImage:
-            'linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url(/images/back1.avif)',
+            ' url(/images/react.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'right center', //  aligns the image to the right
           backgroundRepeat: 'no-repeat',
@@ -20,7 +20,7 @@ const Home = () => {
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
-          color: '#fff',
+          color: 'white',
         }}
       >
         <Box>
@@ -31,7 +31,7 @@ const Home = () => {
           }}>
               Welcome To Tech Quiz
             </Typography>
-            <Typography variant="h6" mb={4}>
+            <Typography variant="h6" mb={4} sx={{color:"rgba(0,0,0,0.8)",fontWeight:"bold"}}>
               Register/Login To Start Quiz
             </Typography>
             <Stack direction="row" spacing={2} justifyContent="center">

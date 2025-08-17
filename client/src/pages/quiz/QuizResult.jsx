@@ -26,9 +26,12 @@ const QuizResult = () => {
         queryKey: ['result'],
         staleTime: 0, // Always fetch fresh
         cacheTime: 0, // No cache storage
-
+        refetchOnMount: 'always',
+        refetchOnWindowFocus: false,
     });
 
+
+    console.log("quiz result", results)
     const groupByCategory = (results) => {
         return results.reduce((acc, curr) => {
             if (!curr.categoryName) return acc; //  Just skip, don't return null
@@ -68,7 +71,7 @@ const QuizResult = () => {
     const categories = Object.keys(grouped);
     const currentCategory = categories[subjectPage];
     const currentQuestions = grouped[currentCategory] || [];
-
+    console.log("currentQuestions", currentQuestions)
     const subjectCorrect = currentQuestions.filter((q) => q.isCorrect).length;
     const subjectPercentage = Math.round((subjectCorrect / currentQuestions.length) * 100);
 
@@ -101,7 +104,7 @@ const QuizResult = () => {
 
                     <Grid container spacing={3}>
                         {currentQuestions.map((q, index) => (
-                            <Grid item xs={12} md={6} key={q._id}>
+                            <Grid item xs={12} md={6} key={index}>
                                 <Paper elevation={3} sx={{ p: 2 }}>
                                     <Typography variant="subtitle1" fontWeight="bold">
                                         {index + 1}. {q.question}
@@ -127,7 +130,7 @@ const QuizResult = () => {
                                     )}
 
                                     <Typography mt={1} variant="body2" color="textSecondary">
-                                        Submitted at: {new Date(q.submittedAt).toLocaleString()} ({q.timeZone})
+                                        Submitted at: {new Date(q.submittedAt).toLocaleString()}
                                     </Typography>
                                 </Paper>
                             </Grid>

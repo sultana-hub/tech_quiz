@@ -280,7 +280,7 @@ class UsersAuthController {
     //profile
     async getProfile(req, res) {
         try {
-const userId=req.params.userId
+            const userId = req.params.userId
             if (!mongoose.Types.ObjectId.isValid(userId)) {
                 return res.status(400).json({
                     status: false,
@@ -408,10 +408,10 @@ const userId=req.params.userId
                     message: 'Password is required'
                 });
             }
-            const userdata = await userModel.findOne({ _id: user_id });
+            const userdata = await UserModel.findOne({ _id: user_id });
             if (userdata) {
                 const newPassword = await hashedPassword(password);
-                const updateuser = await userModel.findOneAndUpdate({ _id: user_id },
+                const updateuser = await UserModel.findOneAndUpdate({ _id: user_id },
                     {
                         $set: {
                             password: newPassword
@@ -441,7 +441,7 @@ const userId=req.params.userId
             if (!email) {
                 return res.status(400).json({ status: false, message: "Email field is required" });
             }
-            const user = await userModel.findOne({ email });
+            const user = await UserModel.findOne({ email });
             if (!user) {
                 return res.status(404).json({ status: false, message: "Email doesn't exist" });
             }
@@ -449,7 +449,7 @@ const userId=req.params.userId
             const secret = user._id + process.env.WT_SECRET_KEY;
             const token = jwt.sign({ userID: user._id }, secret, { expiresIn: '20m' });
             // Reset Link and this link generate by frontend developer
-            const resetLink = `${process.env.FRONTEND_HOST}/account/reset-password-confirm/${user._id}/${token}`;
+            const resetLink = `${process.env.FRONTEND_HOST}/password-forget/${user._id}/${token}`;
             //console.log(resetLink);
             // Send password reset email  
             await transporter.sendMail({
@@ -475,7 +475,7 @@ const userId=req.params.userId
         try {
             const { password, confirm_password } = req.body;
             const { id, token } = req.params;
-            const user = await userModel.findById(id);
+            const user = await UserModel.findById(id);
             if (!user) {
                 return res.status(404).json({ status: false, message: "User not found" });
             }
@@ -495,7 +495,7 @@ const userId=req.params.userId
             const newHashPassword = await bcrypt.hash(password, salt);
 
             // Update user's password
-            await userModel.findByIdAndUpdate(user._id, { $set: { password: newHashPassword } });
+            await UserModel.findByIdAndUpdate(user._id, { $set: { password: newHashPassword } });
 
             // Send success response
             res.status(200).json({ status: "success", message: "Password reset successfully" });

@@ -65,8 +65,8 @@ const EditProfile = () => {
     };
 
     return (
-        <Container maxWidth="md" sx={{ mb: 25 }}>
-            <Typography variant="h4" gutterBottom sx={{ mt: 4 }} color="primary">
+        <Container maxWidth="md" sx={{ mb: 20,mt:20 }}>
+            <Typography variant="h4" gutterBottom sx={{ mt: 4 }} color="#23154aff">
                 Edit Your Profile
             </Typography>
             <Typography variant="body2" sx={{ mb: 4 }}>* = required fields</Typography>
@@ -75,7 +75,7 @@ const EditProfile = () => {
 
                 <TextField
                     fullWidth
-                    label="Name"
+                 
                     variant="outlined"
                     margin="normal"
                     {...register("userName", { required: "Name is required" })}
@@ -85,7 +85,6 @@ const EditProfile = () => {
                 <TextField
                     fullWidth
                     disabled
-                    label="Email"
                     variant="outlined"
                     margin="normal"
                     {...register("email", { required: "Email is required" })}

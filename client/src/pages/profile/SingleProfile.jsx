@@ -40,14 +40,14 @@ const SingleProfile = () => {
     }
 
     return (
-        <section class="container">
-            <a href="/" class="btn btn-light">Back To Home</a>
+        <section className="container">
+            <a href="/" className="btn btn-light">Back To Home</a>
 
-            <div class="profile-grid my-1">
+            <div className="profile-grid my-1">
                 {/* <!-- Top --> */}
-                <div class="profile-top bg-primary p-2">
+                <div className="profile-top bg-primary p-2">
                     <img
-                        class="round-img my-1"
+                        className="round-img my-1"
                         src={imagePath(profile?.data?.profilePic)}
                         alt={profile?.data?.userName}
                     //  style={{ width: '100px', height: '100px', objectFit: 'cover' }}
@@ -58,7 +58,7 @@ const SingleProfile = () => {
 
                       <Button
                         variant="contained"
-                        color="secondary"
+                        color="primary"
                         onClick={() => navigate(`/profile/${userId}/update`)} 
                         style={{ marginTop: '10px' }}
                     >

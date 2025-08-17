@@ -11,6 +11,6 @@ router.post('/quiz/start', AuthCheck,UserAndAnswerController.quizStart)
 
 router.get('/categories',AuthCheck,CategoryController.getAllCategory)
 
-router.get('/quiz/result',AuthCheck,UserAndAnswerController.getUserQuizAnswers)
+router.get('/quiz/result',AuthCheck,UserAndAnswerController.getQuizResults)
 
 module.exports=router

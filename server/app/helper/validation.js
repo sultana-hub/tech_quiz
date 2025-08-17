@@ -32,12 +32,8 @@ const answerValidation = Joi.object({
     //     'string.pattern.base': 'Invalid question ID format',
     //     'any.required': 'Question ID is required',
     // }),
-    selectedAnswer: Joi.string().required().messages({
-        'any.required': 'Selected answer is required',
-    }),
-    timeZone: Joi.string().required().messages({
-        'any.required': 'Time zone is required',
-    }),
+      selectedAnswer: Joi.string().allow(null).optional(),
+    timeZone: Joi.string().required()
 });
 
 module.exports = { answerValidation };

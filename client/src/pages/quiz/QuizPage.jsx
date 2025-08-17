@@ -91,7 +91,7 @@ const QuizPage = () => {
 
         // submit each answer
         for (const question of questions) {
-            const selectedAnswer = answers[question._id];
+           const selectedAnswer = answers[question._id] ?? null;
             if (selectedAnswer) {
                 await submitAnswerMutation.mutateAsync({
                     questionId: question._id,
@@ -102,16 +102,24 @@ const QuizPage = () => {
         }
 
 
-        // Invalidate cache so result page gets fresh data
-        queryClient.invalidateQueries({ queryKey: ['result'] });
+
+        // Force immediate fetch of results before moving to results page
+        await queryClient.refetchQueries({ queryKey: ['result'], exact: true });
         // feedback
         if (isTimeout) {
-            alert("⏰ Time’s up! Quiz submitted automatically.");
+
+            setTimeout(() => {
+                alert("⏰ Time’s up! Quiz submitted automatically.");
+                 navigate("/quiz-result");
+            }, 2000)
+
         } else {
+
             alert("✅ Quiz submitted successfully.");
+             navigate("/quiz-result");
         }
 
-        navigate("/quiz-result");
+
     };
 
     if (!questions.length) return <Typography>Loading Quiz...</Typography>;
@@ -161,3 +169,5 @@ const QuizPage = () => {
 };
 
 export default QuizPage;
+
+
