@@ -184,7 +184,7 @@ const Login = () => {
       });
       sessionStorage.setItem('token', data?.token);
       sessionStorage.setItem('avatar', data?.user?.avatar);
-      sessionStorage.setItem('name', data?.user?.name);
+      sessionStorage.setItem('name', data?.user?.userName);
       sessionStorage.setItem("userId", data?.user?._id);
       console.log("login user payload", data);
       navigate(`/profile/${data?.user?._id}`);
