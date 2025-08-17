@@ -14,29 +14,54 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
-import { userLogin } from '../../components/Auth/query';
+import { resetPassword } from '../../components/Auth/query'
 import Swal from 'sweetalert2';
-
+import { useParams } from 'react-router-dom';
 const ResetPassword = () => {
-
+  const { id, token } = useParams();
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
+  const { mutate, isLoading, isError } = useMutation({
+    mutationFn: resetPassword,
+    mutationKey: ['reset'],
+    onSuccess: () => {
+      Swal.fire("Success", "Password reset successfully!", "success");
+      navigate("/login"); // redirect after reset
+    },
+    onError: (err) => {
+      Swal.fire("Error", err.message || "Failed to reset password", "error");
+    }
+  })
+
+
+
   const onSubmit = (data) => {
-    // const payload = {
-    //   email: data.email,
-    //   password: data.password
-    // };
-    // mutate(payload);
+    if (data.password !== data.confirm_password ) {
+      Swal.fire("Error", "Password and confirm password must be the same!", "error");
+      return;
+    }
+
+    mutate(
+      {
+        id,
+        token,
+        password: data.password,
+        confirm_password: data.confirm_password,
+      }
+
+    );
   };
 
 
 
   return (
-      <Container
+    <Container
       maxWidth="lg"
       sx={{
         py: 8,
@@ -44,9 +69,9 @@ const ResetPassword = () => {
         display: 'flex',
         justifyContent: 'center',
         minWidth: { md: '960px' }, // Ensure container is wide enough
-        marginTop:3,
-        marginBottom:2
-        
+        marginTop: 3,
+        marginBottom: 2
+
       }}
     >
       <Box
@@ -85,7 +110,7 @@ const ResetPassword = () => {
               flexShrink: 0, // Prevent form compression
               minWidth: { md: '400px' }, // Ensure form has enough space
               p: 4,
-              mt:5
+              mt: 5
             }}
           >
             <Box sx={{ width: '100%' }}>
@@ -93,8 +118,8 @@ const ResetPassword = () => {
                 Developer Login
               </Typography>
               <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          
-              <TextField
+
+                <TextField
                   fullWidth
                   label="Password"
                   type={showPassword ? "text" : "password"}
@@ -123,12 +148,12 @@ const ResetPassword = () => {
                   type={showPassword ? "text" : "password"}
                   variant="outlined"
                   margin="normal"
-                  {...register("confirm-password", {
-                    required: "Password is required",
+                  {...register("confirm_password", {
+                    required: "Confirm Password is required",
                     minLength: { value: 4, message: "Minimum 4 characters required" },
                   })}
-                  error={!!errors.password}
-                  helperText={errors?.password?.message}
+                  error={!!errors.confirm_password }
+                  helperText={errors?.confirm_password ?.message}
                   autoComplete="new-password"
                   InputProps={{
                     endAdornment: (
@@ -156,7 +181,7 @@ const ResetPassword = () => {
                   {isLoading ? <CircularProgress size={24} /> : "Reset"}
                 </Button>
               </form>
-            
+
               {isError && (
                 <Typography color="error" align="center" sx={{ mt: 2 }}>
                   Invalid Credentials

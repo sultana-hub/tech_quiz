@@ -435,7 +435,7 @@ class UsersAuthController {
 
     //reset password link
 
-    async resetPasswordLink(req, res) {
+    async forgetPasswordLink(req, res) {
         try {
             const { email } = req.body;
             if (!email) {
@@ -443,20 +443,26 @@ class UsersAuthController {
             }
             const user = await UserModel.findOne({ email });
             if (!user) {
-                return res.status(404).json({ status: false, message: "Email doesn't exist" });
+                return res.status(200).json({ success: true, message: "Password reset email sent (if account exists)" });
             }
             // Generate token for password reset
             const secret = user._id + process.env.WT_SECRET_KEY;
             const token = jwt.sign({ userID: user._id }, secret, { expiresIn: '20m' });
             // Reset Link and this link generate by frontend developer
-            const resetLink = `${process.env.FRONTEND_HOST}/password-forget/${user._id}/${token}`;
+            const resetLink = `${process.env.FRONTEND_HOST}/reset-password/${user._id}/${token}`;
             //console.log(resetLink);
             // Send password reset email  
             await transporter.sendMail({
                 from: process.env.EMAIL_FROM,
                 to: user.email,
                 subject: "Password Reset Link",
-                html: `<p>Hello ${user.userName},</p><p>Please <a href="${resetLink}">Click here</a> to reset your password.</p>`
+                html: `
+                       <p>Hello ${user.userName},</p>
+                       <p>Please <a href="${resetLink}">click here</a> to reset your password.</p>
+                       <p>Or copy and paste this link in your browser:</p>
+                       <p><a href="${resetLink}">${resetLink}</a></p>
+                    `
+
             });
             // Send success response
             res.status(200).json({ status: true, message: "Password reset email sent. Please check your email." });
@@ -498,12 +504,48 @@ class UsersAuthController {
             await UserModel.findByIdAndUpdate(user._id, { $set: { password: newHashPassword } });
 
             // Send success response
-            res.status(200).json({ status: "success", message: "Password reset successfully" });
+            res.status(200).json({ status: true, message: "Password reset successfully" });
 
         } catch (error) {
-            return res.status(500).json({ status: "failed", message: "Unable to reset password. Please try again later." });
+            return res.status(500).json({ status: false, message: "Unable to reset password. Please try again later." });
         }
     }
+
+
+    // Change password when logged in
+    async changePassword(req, res) {
+        try {
+            const userId = req.user._id; // comes from auth middleware (JWT in headers)
+            const { currentPassword, newPassword, confirmPassword } = req.body;
+
+            const user = await UserModel.findById(userId);
+            if (!user) {
+                return res.status(404).json({ status: false, message: "User not found" });
+            }
+
+            // verify current password
+            const isMatch = await bcrypt.compare(currentPassword, user.password);
+            if (!isMatch) {
+                return res.status(400).json({ status: false, message: "Current password is incorrect" });
+            }
+
+            // confirm match
+            if (newPassword !== confirmPassword) {
+                return res.status(400).json({ status: false, message: "Passwords do not match" });
+            }
+
+            // hash and save
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(newPassword, salt);
+            await user.save();
+
+            res.status(200).json({ status: true, message: "Password updated successfully" });
+        } catch (err) {
+            console.error("Change password error:", err.message);
+            res.status(500).json({ status: false, message: "Something went wrong" });
+        }
+    }
+
 
 }
 

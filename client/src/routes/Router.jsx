@@ -18,6 +18,8 @@ import QuizPage from '../pages/quiz/QuizPage';
 import QuizResult from '../pages/quiz/QuizResult';
 import ForgetPassword from '../pages/auth/ForgetPassword'
 import AboutUs from '../pages/AboutUs';
+import ResetPassword from '../pages/auth/ResetPassword';
+import UpdatePassword from '../pages/auth/UpdatePassword';
 const ErrorPage = lazy(() => {
   return new Promise((resolve) => {
     setTimeout(() => resolve(import("../pages/ErrorPage"))
@@ -44,6 +46,8 @@ const Router = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/otp" element={<OtpVerification />} />
           <Route path="/password-forget" element={<ForgetPassword/>}/>
+             <Route path="/reset-password/:id/:token" element={<ResetPassword/>}/>
+
           <Route path="/about"element={<AboutUs/>}/>
           {/* protected route */}
           <Route element={<ProtectedRoute />}>
@@ -53,6 +57,7 @@ const Router = () => {
               <Route path="/startQuiz" element={<StartQuiz/>} />
               <Route path="/submitQuiz" element={<QuizPage/>} />
               <Route path="/quiz-result" element={<QuizResult/>}/>
+              <Route path="/update-password" element={<UpdatePassword/>}/>
           </Route>
           {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />

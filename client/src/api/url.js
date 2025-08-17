@@ -1,3 +1,5 @@
+
+
 export const baseUrl = "http://localhost:2001/";
 
 export const endPoints = {
@@ -10,5 +12,7 @@ export const endPoints = {
   startQuiz:"api/quiz/start",
   submitAnswer:"api/answer/create",
   quizResult:"api/quiz/result",
-  categories:"api/categories"
+  categories:"api/categories",
+  forgetPwd:"api/user/forget-password-link",
+  resetPassword:"api/user/reset-password/"
 };

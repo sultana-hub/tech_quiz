@@ -14,15 +14,14 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
- import { userLogin } from '../../components/Auth/query';
 import Swal from 'sweetalert2';
-
+import { forgotPassword } from '../../components/Auth/query';
 const ForgetPassword = () => {
 
   const navigate = useNavigate();
   const { mutate, isLoading, isError } = useMutation({
-    mutationFn: userLogin,
-    mutationKey: ['signin'],
+    mutationFn: forgotPassword,
+    mutationKey: ['forget'],
     onSuccess: (data) => {
       Swal.fire({
         title: "Welcome!",

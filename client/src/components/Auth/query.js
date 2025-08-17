@@ -60,3 +60,52 @@ export const resendOtp = async (emailData) => {
     };
   }
 };
+
+
+export const forgotPassword=async(email)=>{
+  try {
+    const res=await axiosInstance.post(endPoints.forgetPwd,email)
+    return res.data
+  } catch (error) {
+    console.error(" Resend forget error:", error?.res?.data || error.message);
+    throw {
+      status: error?.res?.status || 500,
+      message: error?.res?.data?.message || "Failed to sent link"
+    };
+  }
+}
+
+
+export const resetPassword = async ({ id, token, password, confirm_password  }) => {
+  try {
+    const res = await axiosInstance.put(
+      `${endPoints.resetPassword}${id}/${token}`,
+      { password, confirm_password  } // send body
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Resend password error:", error?.response?.data || error.message);
+    throw {
+      status: error?.response?.status || 500,
+      message: error?.response?.data?.message || "Failed to reset password"
+    };
+  }
+};
+
+
+// query.js
+export const updatePassword = async ({ currentPassword, newPassword, confirmPassword }) => {
+  try {
+    const res = await axiosInstance.put("/api/user/update-password", {
+      currentPassword,
+      newPassword,
+      confirmPassword
+    });
+    return res.data;
+  } catch (error) {
+    throw {
+      status: error?.response?.status || 500,
+      message: error?.response?.data?.message || "Failed to update password"
+    };
+  }
+};

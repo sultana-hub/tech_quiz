@@ -90,8 +90,9 @@ import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-
+import { useParams } from 'react-router-dom';
 const Navbar = () => {
+  // const { id, token } = useParams();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const token = sessionStorage.getItem('token');
@@ -115,7 +116,7 @@ const Navbar = () => {
   };
 
   const handleUpdatePassword = () => {
-    navigate('/update-password'); // Assuming a route for updating password
+    navigate("/update-password");; // Assuming a route for updating password
     handleMenuClose();
   };
 
@@ -143,7 +144,7 @@ const Navbar = () => {
                 Quiz
               </Button>
               <Button color="inherit" component={Link} to={`/quiz-result`}>
-                Quiz Result
+               Score
               </Button>
               <Box>
                 <IconButton
