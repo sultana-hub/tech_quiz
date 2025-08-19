@@ -76,7 +76,7 @@ class UserAndAnswerController {
     try {
       const userId = req.user._id;
       let { questionId, selectedAnswer, timeZone } = req.body;
-
+      if (selectedAnswer) selectedAnswer = selectedAnswer.trim();
       if (!selectedAnswer) selectedAnswer = null;
 
       const { error } = answerValidation.validate({ selectedAnswer, timeZone });
@@ -176,9 +176,9 @@ class UserAndAnswerController {
       ]);
 
       if (!result.length) {
-        return res.status(404).json({
+        return res.status(200).json({
           status: false,
-          message: "No questions found for this category",
+          message: "No quiz available for the selected subject",
           data: []
         });
       }
@@ -396,7 +396,7 @@ class UserAndAnswerController {
           selectedAnswer: userAnswer && userAnswer.selectedAnswer ? userAnswer.selectedAnswer : "Not Attempted",
           isCorrect: userAnswer && userAnswer.selectedAnswer ? userAnswer.selectedAnswer === q.correctAnswer : false,
           score: userAnswer && userAnswer.selectedAnswer ? (userAnswer.selectedAnswer === q.correctAnswer ? 1 : 0) : 0,
-         submittedAt:userAnswer && userAnswer.selectedAnswer?userAnswer.submittedAt:Date.now()
+          submittedAt: userAnswer && userAnswer.selectedAnswer ? userAnswer.submittedAt : Date.now()
         };
       });
       console.log("quiz backend result", results)

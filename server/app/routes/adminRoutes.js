@@ -37,8 +37,8 @@ router.delete('/category/delete/:id',CategoryController.deleteCategory)
 
 //users route
 
-router.get('/user/list', AdminController.getUserWithAnswer)
+router.get('/user/list', AdminController.getUsersList)
 
-
+router.get('/user/score', AdminController.getUserScoresByCategory)
 
 module.exports=router

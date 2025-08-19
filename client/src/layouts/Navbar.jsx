@@ -144,7 +144,7 @@ const Navbar = () => {
                 Quiz
               </Button>
               <Button color="inherit" component={Link} to={`/quiz-result`}>
-               Score
+               Result
               </Button>
               <Box>
                 <IconButton

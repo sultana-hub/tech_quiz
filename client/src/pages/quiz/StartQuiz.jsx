@@ -133,6 +133,7 @@ import { useNavigate } from 'react-router-dom';
 import { startQuiz, allCategories } from '../../components/quiz/quizQuery';
 import { useForm } from 'react-hook-form';
 import Features from '../../components/Features';
+import Swal from 'sweetalert2';
 
 const timeZones = Intl.supportedValuesOf('timeZone');
 
@@ -149,12 +150,18 @@ const StartQuiz = () => {
   const startQuizMutation = useMutation({
     mutationFn: startQuiz,
     onSuccess: (data) => {
+      console.log("data",data)
       if (data?.status && Array.isArray(data?.questions)) {
         localStorage.setItem('quizData', JSON.stringify(data.questions));
         localStorage.setItem('timeZone', data.timeZone);
         localStorage.setItem('subject', data?.categoryName);
         navigate('/submitQuiz');
       } else {
+         Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Quiz is not available for the selected subject!",
+              });
         console.error("Quiz start failed: Invalid or missing questions");
       }
     },

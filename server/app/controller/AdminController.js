@@ -1,6 +1,7 @@
 const httpStatusCode = require('../helper/httpStatusCode')
-const  QuestionModel  = require('../model/question')
-const  CategoryModel  = require('../model/category')
+const QuestionModel = require('../model/question')
+const CategoryModel = require('../model/category')
+const { UserModel } = require('../model/user')
 // const mongoose = require('mongoose')
 
 class AdminController {
@@ -111,20 +112,117 @@ class AdminController {
         }
     }
 
-    async getUserWithAnswer(req, res) {
+    async getUsersList(req, res) {
         try {
-            const users = await QuestionModel.aggregate([
+            const users = await UserModel.aggregate([
                 {
                     $match: {}
                 }
             ])
-            res.render('users/list', { title: "Users and Answers", users })
+            res.render('users/list', { title: "Users", users })
         } catch (error) {
-            res.status(httpStatusCode.InternalServerError).send(error)
+            console.error("getUsersList error:", error);
+            res.status(httpStatusCode.InternalServerError).send(error.message)
         }
     }
 
+    async getUserScoresByCategory(req, res) {
+        try {
+         const results = await QuestionModel.aggregate([
+  { $unwind: "$answers" },
 
+  // join user details
+  {
+    $lookup: {
+      from: "users",
+      localField: "answers.userId",
+      foreignField: "_id",
+      as: "userDetails"
+    }
+  },
+  { $unwind: "$userDetails" },
+
+  // join categories
+  {
+    $lookup: {
+      from: "categories",
+      localField: "categoryIds",
+      foreignField: "_id",
+      as: "categories"
+    }
+  },
+  { $unwind: "$categories" },
+
+  // group per user + category (user's achieved score)
+  {
+    $group: {
+      _id: {
+        userId: "$userDetails._id",
+        categoryId: "$categories._id"
+      },
+      userName: { $first: "$userDetails.userName" },
+      email: { $first: "$userDetails.email" },
+      categoryName: { $first: "$categories.categoryName" }, // adjust field name
+      totalScore: { $sum: "$answers.score" }
+    }
+  },
+
+  // lookup again to compute max possible score per category
+  {
+    $lookup: {
+      from: "questions",
+      localField: "_id.categoryId",
+      foreignField: "categoryIds",
+      as: "categoryQuestions"
+    }
+  },
+
+  // compute maxScore for category
+  {
+    $addFields: {
+      maxScore: {
+        $sum: {
+          $map: {
+            input: "$categoryQuestions",
+            as: "q",
+            in: {
+              $cond: [
+                { $gt: [{ $size: "$$q.options" }, 0] },
+                // assume each question max score = highest score among answers
+                { $max: "$$q.answers.score" },
+                0
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+
+  // compute percentage
+  {
+    $addFields: {
+      percentage: {
+        $cond: [
+          { $gt: ["$maxScore", 0] },
+          { $round: [{ $multiply: [{ $divide: ["$totalScore", "$maxScore"] }, 100] }, 2] },
+          0
+        ]
+      }
+    }
+  },
+
+  { $project: { categoryQuestions: 0 } }, // cleanup
+  { $sort: { userName: 1, categoryName: 1 } }
+]);
+
+            console.log("score result",results)
+            res.render("userScore/score", { title:"Scores",results });
+        } catch (err) {
+            console.error("Error fetching user scores:", err);
+            res.status(500).send("Server Error",err.message);
+        }
+    }
 
 
 

@@ -50,7 +50,7 @@
                         <div class="container-fluid">
 
                             <!-- Page Heading -->
-                            <h1 class="h3 mb-2 text-gray-800">Users</h1>
+                            <h1 class="h3 mb-2 text-gray-800">Users Scores By Subjects</h1>
 
                             <!-- DataTales Example -->
                             <div class="card shadow mb-4">
@@ -60,72 +60,55 @@
                                 </div>
 
 
-                                <% if(!users||users.length===0){%>
+                                <% if(!results||results.length===0){%>
                                     <p class="text-center text-danger mt-3">No data found</p>
 
                                     <% }else {%>
 
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table class="table table-bordered" id="dataTable" width="100%"
-                                                    cellspacing="0">
-                                                    <thead>
+                                                <table class="table table-bordered table-striped">
+                                                    <thead class="table-dark">
                                                         <tr>
-                                                            <th>#</th>
-                                                            <th> Name</th>
-                                                            <th> Email</th>
-                                                            <th> Image</th>
-                                                            <th>Actions</th>
+                                                            <th>User Name</th>
+                                                            <th>Email</th>
+                                                            <th>Subject</th>
+                                                            <th>Total Score</th>
+                                                            <th>Max Score</th>
+                                                            <th>Percentage</th>
                                                         </tr>
                                                     </thead>
-                                                    <tfoot>
-                                                        <tr>
-                                                        <tr>
-                                                            <th>#</th>
-                                                            <th> Name</th>
-                                                            <th> Email</th>
-                                                            <th> Image</th>
-                                                            <th>Actions</th>
-                                                        </tr>
-                                                        </tr>
-                                                    </tfoot>
                                                     <tbody>
-                                                        <% users.forEach((u, index)=> { %>
-                                                            <tr>
-                                                                <td>
-                                                                    <%= index + 1 %>
-                                                                </td>
-
-                                                                <td>
-                                                                    <%= u.userName %>
-                                                                </td>
-
-                                                                <td>
-                                                                    <%= u.email %>
-                                                                </td>
-
-                                                                <td>
-                                                                    <% if (u.profilePic) { %>
-                                                                        <img src="<%= u.profilePic %>"
-                                                                            alt="User Image" width="50" height="50"
-                                                                            style="border-radius:50%;">
-                                                                        <% } else { %>
-                                                                            <span class="text-muted">No image</span>
-                                                                            <% } %>
-                                                                </td>
-
-                                                                <td>
-                                                                    <form
-                                                                        action="/user/delete/<%= u._id %>?_method=DELETE"
-                                                                        method="POST" style="display:inline-block;">
-                                                                        <button class="btn btn-danger btn-sm"
-                                                                            onclick="return confirm('Are you sure?')">Delete</button>
-                                                                    </form>
-                                                                </td>
-                                                            </tr>
-                                                            <% }) %>
+                                                        <% if (results.length> 0) { %>
+                                                            <% results.forEach(score=> { %>
+                                                                <tr>
+                                                                    <td>
+                                                                        <%= score.userName %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= score.email %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= score.categoryName %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= score.totalScore %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= score.maxScore %>
+                                                                    </td>
+                                                                    <td>
+                                                                        <%= score.percentage %> %
+                                                                    </td>
+                                                                </tr>
+                                                                <% }) %>
+                                                                    <% } else { %>
+                                                                        <tr>
+                                                                            <td colspan="6" class="text-center">No
+                                                                                scores found</td>
+                                                                        </tr>
+                                                                        <% } %>
                                                     </tbody>
-
                                                 </table>
                                             </div>
                                         </div>
