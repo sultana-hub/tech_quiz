@@ -398,7 +398,7 @@ class UsersAuthController {
 
 
 
-    /**update password */
+    /**update password  not using this*/
     async updatePassword(req, res) {
         try {
             const user_id = req.body.user_id;

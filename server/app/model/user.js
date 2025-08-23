@@ -46,6 +46,10 @@ const UserSchema = new schema({
     isAdmin:{
         type:String,
         default:"user"
+    },
+    idDeleted:{
+        type:Boolean,
+        default:false
     }
 });
 

@@ -61,30 +61,56 @@
 
                                 <div class="card-body">
 
-                                    <form action="/product/update/<%= product._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
+                                    <form action="/question/update/<%= question._id %>?_method=PUT" method="POST"
+                                      >
+                                        <!-- Question Text -->
                                         <div class="form-group">
-                                            <label for="courseName">Name</label>
-                                            <input type="text" class="form-control" name="name"     value="<%= product.name %>" >
-
-                                        </div>
-                                        <select class="form-control" name="category" required value="<%= product.category %>">
-                                            <option value="">-- Select Category --</option>
-                                            <% category.forEach(cat=> { %>
-                                                <option value="<%= cat._id %>">
-                                                    <%= cat.name %>
-                                                </option>
-                                                <% }) %>
-                                        </select>
-                                        <div class="form-group">
-                                            <label for="price">Description</label>
-                                            <input type="text" class="form-control" name="description" multiple value="<%= product.description %>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="image">Image</label>
-                                            <input type="file" class="form-control" name="image" value="<%= product.image %>">
+                                            <label for="question">Question</label>
+                                            <input type="text" class="form-control" id="question" name="question"
+                                                value="<%= question.question %>" required>
                                         </div>
 
-                                        <button type="submit" class="btn btn-primary">Edit Question</button>
+                                        <!-- Options -->
+                                        <div class="form-group">
+                                            <label>Options</label>
+                                            <div id="options-container">
+                                                <% question.options.forEach(function(opt, i) { %>
+                                                    <div class="input-group mb-2">
+                                                        <input type="text" class="form-control" name="options[]"
+                                                            value="<%= opt %>" required>
+                                                        <!-- <div class="input-group-append">
+                                                            <button type="button"
+                                                                class="btn btn-danger btn-remove-option">X</button>
+                                                        </div> -->
+                                                    </div>
+                                                    <% }) %>
+                                            </div>
+                                            <!-- <button type="button" class="btn btn-success mt-2" id="add-option">+ Add
+                                                Option</button> -->
+                                        </div>
+
+                                        <!-- Correct Answer -->
+                                        <div class="form-group">
+                                            <label for="correctAnswer">Correct Answer</label>
+                                            <input type="text" class="form-control" id="correctAnswer"
+                                                name="correctAnswer" value="<%= question.correctAnswer %>" required>
+                                        </div>
+
+                                        <!-- Category Dropdown -->
+                                        <div class="form-group">
+                                            <label for="categoryIds">Category</label>
+                                            <select class="form-control" id="categoryIds" name="categoryIds" multiple
+                                                required>
+                                                <% categories.forEach(cat=> { %>
+                                                    <option value="<%= cat._id %>" <%=question.categoryIds.some(c=>
+                                                        c.toString() === cat._id.toString()) ? "selected" : "" %>>
+                                                        <%= cat.categoryName %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary">Update Question</button>
                                         <a href="/question/list" class="btn btn-secondary">Back</a>
                                     </form>
                                 </div>
