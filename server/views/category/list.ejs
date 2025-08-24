@@ -102,17 +102,19 @@
 
 
                                                                 <td>
-                                                                    <a href="/category/<%= cat._id %>/edit"
-                                                                        class="btn btn-warning btn-sm">Edit</a>
+                                                                    <div class="d-flex gap-2">
+                                                                        <a href="/category/<%= cat._id %>/edit"
+                                                                            class="btn btn-warning btn-sm mr-2">Edit</a>
 
-                                                                    <form
-                                                                        action="/category/delete/<%= cat._id %>?_method=DELETE"
-                                                                        method="POST" style="display:inline-block;">
-                                                                        <button class="btn btn-danger btn-sm"
-                                                                            onclick="return confirm('Are you sure?')">Delete</button>
-                                                                    </form>
-
+                                                                        <form
+                                                                            action="/category/delete/<%= cat._id %>?_method=DELETE"
+                                                                            method="POST" style="display:inline-block;">
+                                                                            <button class="btn btn-danger btn-sm"
+                                                                                onclick="return confirm('Are you sure?')">Delete</button>
+                                                                        </form>
+                                                                    </div>
                                                                 </td>
+
                                                             </tr>
                                                             <% }) %>
                                                     </tbody>

@@ -83,12 +83,12 @@ const QuizResult = () => {
                 </Typography>
 
                 <Box mb={3}>
-                    <Typography variant="h6">Total Questions: {total}</Typography>
+                    <Typography variant="h6">Total Questions: {currentQuestions.length}</Typography>
                     <Typography variant="h6" color="success.main">
-                        Correct Answers: {correct}
+                        Correct Answers: {subjectCorrect}
                     </Typography>
                     <Typography variant="h6">
-                        Score: {correct}/{total} ({percentage}%)
+                        Score: {subjectCorrect}/{currentQuestions.length} ({subjectPercentage}%)
                     </Typography>
                 </Box>
 

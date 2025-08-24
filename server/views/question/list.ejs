@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -73,7 +74,7 @@
                                                             <th> Question</th>
                                                             <th> Options</th>
                                                             <th> Correct Answer</th>
-                                                                <th> Duration\Minute</th>
+                                                            <th> Duration\Minute</th>
                                                             <th>Actions</th>
                                                         </tr>
                                                     </thead>
@@ -111,23 +112,26 @@
 
                                                                     <%=q.correctAnswer%>
                                                                 </td>
-                                                               
-                                                                 <td>
+
+                                                                <td>
 
                                                                     <%=q.duration%>
                                                                 </td>
+
                                                                 <td>
-                                                                    <a href="/question/<%= q._id %>/edit"
-                                                                        class="btn btn-warning btn-sm">Edit</a>
+                                                                    <div class="d-flex gap-2">
+                                                                        <a href="/question/<%= q._id %>/edit"
+                                                                            class="btn btn-warning btn-sm mr-2">Edit</a>
 
-                                                                    <form
-                                                                        action="/question/delete/<%= q._id %>?_method=DELETE"
-                                                                        method="POST" style="display:inline-block;">
-                                                                        <button class="btn btn-danger btn-sm"
-                                                                            onclick="return confirm('Are you sure?')">Delete</button>
-                                                                    </form>
-
+                                                                        <form
+                                                                            action="/question/delete/<%= q._id %>?_method=DELETE"
+                                                                            method="POST" style="display:inline-block;">
+                                                                            <button class="btn btn-danger btn-sm"
+                                                                                onclick="return confirm('Are you sure?')">Delete</button>
+                                                                        </form>
+                                                                    </div>
                                                                 </td>
+
                                                             </tr>
                                                             <% }) %>
                                                     </tbody>
