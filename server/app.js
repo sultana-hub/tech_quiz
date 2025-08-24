@@ -8,15 +8,26 @@ const path=require('path')
 const fs=require('fs')
 const methodOverride = require('method-override');
 const session = require('express-session');
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+const SwaggerOptions = require('./swagger.json');
+const swaggerDocument = swaggerJsDoc(SwaggerOptions);
+const rateLimitMiddleware = require('./app/helper/realLimit');
+const logger=require('./app/helper/logger')
 
 dbCon()
 const app=express()
 app.use(cors())
+
+
 // Fix CSP here
 app.use((req, res, next) => {
     res.setHeader("Content-Security-Policy", "default-src * 'self' data: blob:;");
     next();
 });
+
+
+app.use(rateLimitMiddleware);
 
 app.use(session({
   secret: 'myquizsecret',
@@ -37,6 +48,7 @@ app.set("views", "views")
 app.use(express.static(__dirname + '/public'));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 //routes front end 
 //quiz routes
 const quiz=require('./app/routes/userAnsRoutes')
@@ -50,6 +62,7 @@ app.use( adminRoute)
 const port=2001
 
 app.listen(port,()=>{
-    console.log("😊😀sever is running at port:",port)
+    // console.log("😊😀sever is running at port:",port)
+       logger.info(`Server listening on port ${port}`)
 })
 

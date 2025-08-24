@@ -1,0 +1,41 @@
+{
+    "swaggerDefinition": {
+        "openapi": "3.0.0",
+        "info": {
+            "title": "TechQuiz API",
+            "version": "1.0.0",
+            "description": "TechQuiz API documentation create",
+            "contact": {
+                "name": "Parveen Sultana"
+            }
+        },
+        "host": "localhost:2001",
+        "basePath": "/",
+        "schemes": [
+            "http"
+        ],
+        "tags": [
+            {
+                "name": "Users",
+                "description": "Users CRUD API"
+            },
+            {
+                "name": "Quiz",
+                "description": "Quiz and Answer APIs"
+            }
+        ]
+    },
+    "components": {
+        "securitySchemes": {
+            "xAccessToken": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "x-access-token",
+                "description": "Enter your JWT token here"
+            }
+        }
+    },
+    "apis": [
+        "./app/routes/*.js"
+    ]
+}

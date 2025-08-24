@@ -35,8 +35,21 @@ router.put('/category/update/:id', CategoryController.updateCategory)
 
 router.delete('/category/delete/:id', CategoryController.deleteCategory)
 
-//users route
+// //users route
 
+//   /**
+//  * @swagger
+//  * /user/list:
+//  *  get:
+//  *    summary: Get all the user from Database
+//  *    tags:
+//  *       - Users
+//  *    produces:
+//  *      - application/json
+//  *    responses:
+//  *      '200':
+//  *        description: data fetched successfully.
+//  */
 router.get('/user/list', AdminController.getUsersList)
 
 router.delete('/user/:userId',AdminController.softDelete)
