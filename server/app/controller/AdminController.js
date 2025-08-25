@@ -1,23 +1,136 @@
 const httpStatusCode = require('../helper/httpStatusCode')
 const QuestionModel = require('../model/question')
 const CategoryModel = require('../model/category')
-const { UserModel } = require('../model/user')
- const mongoose = require('mongoose')
-
+const { UserModel, loginValidation } = require('../model/user')
+const mongoose = require('mongoose')
+const { hashedPassword, comparePassword } = require("../middleware/auth");
+const jwt = require('jsonwebtoken')
 class AdminController {
+
+  async ejsAuthCheck(req, res, next) {
+    try {
+      if (req.user) {
+        return next();
+      }
+      return res.redirect('/'); // login page
+    } catch (err) {
+      console.error("AuthCheck Error:", err);
+      return res.redirect('/');
+    }
+  };
+
+  async loginpage(req, res) {
+    try {
+      const message = req.flash('message', "Welcome to login page !");
+      res.render('login', {
+        title: "Login",
+        message
+      });
+    } catch (error) {
+      console.error(error);
+      req.flash('message', "Internal server error");
+      res.redirect('/');
+    }
+  }
+
+
+
+
+  async login(req, res) {
+    try {
+      const { error, value } = loginValidation.validate(req.body);
+      if (error) {
+        req.flash('message', error.details[0].message);
+        return res.redirect('/');
+      }
+
+      const user = await UserModel.findOne({ email: value.email });
+      if (!user) {
+        req.flash('message', "User not found");
+        return res.redirect('/');
+      }
+
+      const isMatch = await comparePassword(value.password, user.password);
+      if (!isMatch) {
+        req.flash('message', "Invalid password");
+        return res.redirect('/');
+      }
+
+      //  Access Token (short expiry)
+      const accessToken = jwt.sign(
+        {
+          _id: user._id,
+          userName: user.userName,
+          email: user.email,
+
+        },
+        process.env.JWT_SECRET_KEY,
+        { expiresIn: "15m" } // short lived
+      );
+
+      
+      await user.save();
+
+      //  Set cookies
+      res.cookie("usertoken", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 15 * 60 * 1000 // 15 minutes
+      });
+
+  
+
+      req.flash("message", "Welcome admin!");
+      return res.redirect("/dashboard");
+
+    } catch (err) {
+      console.error(" Login error:", err);
+      req.flash("message", "Internal server error");
+      return res.redirect("/");
+    }
+  }
+
+  async logout(req, res) {
+    try {
+      // If you stored JWT in cookies
+      res.clearCookie("token");
+      // If you also used session
+      req.session.destroy(() => {
+        res.redirect("/?message=Logged out successfully");
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      res.redirect("/?error=Something went wrong");
+    }
+  }
+
+
   async dashboard(req, res) {
     try {
+      //Logged-in user comes from JWT (middleware attached req.user)
+      const loggedInUser = req.user;
+       const questions=await QuestionModel.find()
+       const category=await CategoryModel.find()
+      //  Use flash for dynamic message
+      req.flash("success", `Welcome to ${loggedInUser.userName} dashboard`);
 
-      res.render('dashboard', {
-        title: "dashboard"
-      })
-
+      res.render("dashboard", {
+        title: `${loggedInUser.userName} Dashboard`,
+        user: loggedInUser,   // only logged-in user
+        message: req.flash("success"),
+        questions:questions.length,
+        category:category.length
+      });
     } catch (error) {
-      console.log(error.message);
-
+      console.error("Dashboard error:", error);
+      req.flash("error", "Failed to load dashboard");
+      return res.redirect("/");
     }
-
   }
+
+
+
   //Question admin
   async listQuestionPage(req, res) {
     try {
@@ -67,35 +180,35 @@ class AdminController {
 
   async editQuestionPage(req, res) {
     try {
-    const questionData = await QuestionModel.aggregate([
-      {
-        $match: { _id: new mongoose.Types.ObjectId(req.params.id) }
-      },
-      {
-        $lookup: {
-          from: "categories",              // collection name in MongoDB
-          localField: "categoryIds",
-          foreignField: "_id",
-          as: "categoriesInfo"
+      const questionData = await QuestionModel.aggregate([
+        {
+          $match: { _id: new mongoose.Types.ObjectId(req.params.id) }
+        },
+        {
+          $lookup: {
+            from: "categories",              // collection name in MongoDB
+            localField: "categoryIds",
+            foreignField: "_id",
+            as: "categoriesInfo"
+          }
         }
+      ]);
+
+      if (!questionData.length) {
+        return res.status(404).send("Question not found");
       }
-    ]);
 
-    if (!questionData.length) {
-      return res.status(404).send("Question not found");
+      const question = questionData[0];
+      const allCategories = await CategoryModel.find();
+
+      res.render("question/edit", {
+        question,
+        categories: allCategories
+      });
+    } catch (err) {
+      console.error("Error fetching question with lookup:", err);
+      res.status(500).send("Server error");
     }
-
-    const question = questionData[0];
-    const allCategories = await CategoryModel.find();
-
-    res.render("question/edit", {
-      question,
-      categories: allCategories
-    });
-  } catch (err) {
-    console.error("Error fetching question with lookup:", err);
-    res.status(500).send("Server error");
-  }
   }
 
 
@@ -152,7 +265,7 @@ class AdminController {
     try {
       const users = await UserModel.aggregate([
         {
-          $match: {isDeleted:false}
+          $match: { isDeleted: false }
         }
       ])
       res.render('users/list', { title: "Users", users })
@@ -261,7 +374,7 @@ class AdminController {
   }
 
 
-  async softDelete(req,res){
+  async softDelete(req, res) {
 
   }
 

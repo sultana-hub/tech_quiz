@@ -14,7 +14,8 @@ const SwaggerOptions = require('./swagger.json');
 const swaggerDocument = swaggerJsDoc(SwaggerOptions);
 const rateLimitMiddleware = require('./app/helper/realLimit');
 const logger=require('./app/helper/logger')
-
+const flash = require('connect-flash');
+const cookieParser = require("cookie-parser");
 dbCon()
 const app=express()
 app.use(cors())
@@ -35,8 +36,8 @@ app.use(session({
   saveUninitialized: true,
   cookie: { secure: false } // use true if using HTTPS
 }));
-
-
+app.use(flash());
+app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 //method override

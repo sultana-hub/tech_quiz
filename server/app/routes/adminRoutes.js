@@ -3,11 +3,21 @@ const AdminController = require("../controller/AdminController")
 // const productImageUploads=require('../helper/productImageUpload')
 const QuestionController = require('../controller/QuestionController')
 const CategoryController = require('../controller/CategoryController')
+const EjsAuthCheck = require('../middleware/EjsAuthCheck')
 const router = express.Router()
 
 
 // router.post("/register",UsersImageUploads.single('image'),AuthController.register)
-router.get("/", AdminController.dashboard)
+
+//view login and register pages
+router.get('/', AdminController.loginpage)
+
+//post login pages
+router.post('/login', AdminController.login)
+
+ router.get('/logout',EjsAuthCheck,AdminController.logout)
+
+router.get("/dashboard",EjsAuthCheck, AdminController.dashboard)
 
 //question admin route
 router.get('/question/list', AdminController.listQuestionPage)

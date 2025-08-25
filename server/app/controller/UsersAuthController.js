@@ -192,8 +192,6 @@ class UsersAuthController {
     }
 
 
-
-
     //login
     async login(req, res) {
         try {
