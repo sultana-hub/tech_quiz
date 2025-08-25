@@ -11,6 +11,7 @@ class QuestionController {
         const { question, options, correctAnswer, category } = req.body;
         // Trim whitespace from answers
         if (correctAnswer) correctAnswer = correctAnswer.trim()
+        if (options && Array.isArray(options)) options = options.map(opt => opt.trim());
         try {
             const categoryArray = Array.isArray(category) ? category : [category];
 

@@ -192,19 +192,19 @@ class UserAndAnswerController {
       });
 
 
-      if (!questions.length) {
-        return res.status(404).json({
-          status: false,
-          message: 'No questions found for this category'
-        });
-      }
+      // if (!questions.length) {
+      //   return res.status(404).json({
+      //     status: false,
+      //     message: 'No questions found for this category'
+      //   });
+      // }
 
-      return res.status(200).json({
-        status: true,
-        message: 'Quiz started',
-        timeZone,
-        questions
-      });
+      // return res.status(200).json({
+      //   status: true,
+      //   message: 'Quiz started',
+      //   timeZone,
+      //   questions
+      // });
 
     } catch (error) {
       return res.status(500).json({
@@ -378,37 +378,78 @@ class UserAndAnswerController {
   }
 
 
-  getQuizResults = async (req, res) => {
-    try {
-      const userId = req.user._id; // assuming auth middleware sets req.user
+  // getQuizResults = async (req, res) => {
+  //   try {
+  //     const userId = req.user._id; // assuming auth middleware sets req.user
 
-      const questions = await QuestionModel.find({})
-        .populate("categoryIds", "categoryName");
+  //     const questions = await QuestionModel.find({})
+  //       .populate("categoryIds", "categoryName");
 
-      const results = questions.map((q) => {
-        const userAnswer = q.answers.find(a => a.userId.toString() === userId.toString());
+  //     const results = questions.map((q) => {
+  //       const userAnswer = q.answers.find(a => a.userId.toString() === userId.toString());
 
-        return {
-          questionId: q._id,
-          question: q.question,
-          categoryName: q.categoryIds?.[0]?.categoryName || "Unknown", // if populated
-          correctAnswer: q.correctAnswer,
-          selectedAnswer: userAnswer && userAnswer.selectedAnswer ? userAnswer.selectedAnswer : "Not Attempted",
-          isCorrect: userAnswer && userAnswer.selectedAnswer ? userAnswer.selectedAnswer === q.correctAnswer : false,
-          score: userAnswer && userAnswer.selectedAnswer ? (userAnswer.selectedAnswer === q.correctAnswer ? 1 : 0) : 0,
-          submittedAt: userAnswer && userAnswer.selectedAnswer ? userAnswer.submittedAt : Date.now()
-        };
-      });
-      console.log("quiz backend result", results)
-      return res.status(200).json({
-        message: ":result fectched",
-        data: results
-      });
-    } catch (error) {
-      console.error("Error fetching quiz results:", error);
-      res.status(500).json({ message: error.message });
-    }
-  };
+  //       return {
+  //         questionId: q._id,
+  //         question: q.question,
+  //         categoryName: q.categoryIds?.[0]?.categoryName || "Unknown", // if populated
+  //         correctAnswer: q.correctAnswer,
+  //         selectedAnswer: userAnswer && userAnswer.selectedAnswer ? userAnswer.selectedAnswer : "Not Attempted",
+  //         isCorrect: userAnswer && userAnswer.selectedAnswer ? userAnswer.selectedAnswer === q.correctAnswer : false,
+  //         score: userAnswer && userAnswer.selectedAnswer ? (userAnswer.selectedAnswer === q.correctAnswer ? 1 : 0) : 0,
+  //         submittedAt: userAnswer && userAnswer.selectedAnswer ? userAnswer.submittedAt : Date.now()
+  //       };
+  //     });
+  //     console.log("quiz backend result", results)
+  //     return res.status(200).json({
+  //       message: ":result fectched",
+  //       data: results
+  //     });
+  //   } catch (error) {
+  //     console.error("Error fetching quiz results:", error);
+  //     res.status(500).json({ message: error.message });
+  //   }
+  // };
+
+
+getQuizResults = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    // Fetch only questions where this user has answered
+    const questions = await QuestionModel.find({
+      "answers.userId": userId
+    }).populate("categoryIds", "categoryName");
+
+    // Map results only for answered questions
+    const results = questions.map((q) => {
+      const userAnswer = q.answers.find(a => a.userId.toString() === userId.toString());
+
+      return {
+        questionId: q._id,
+        question: q.question,
+        categoryName: q.categoryIds?.[0]?.categoryName || "Unknown",
+        correctAnswer: q.correctAnswer,
+        selectedAnswer: userAnswer?.selectedAnswer || "Not Attempted",
+        isCorrect: userAnswer?.selectedAnswer
+          ? userAnswer.selectedAnswer === q.correctAnswer
+          : false,
+        score: userAnswer?.selectedAnswer
+          ? (userAnswer.selectedAnswer === q.correctAnswer ? 1 : 0)
+          : 0,
+        submittedAt: userAnswer?.submittedAt || null
+      };
+    });
+
+    return res.status(200).json({
+      message: "Results fetched",
+      data: results
+    });
+  } catch (error) {
+    console.error("Error fetching quiz results:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 
 

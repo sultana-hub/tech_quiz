@@ -150,7 +150,7 @@ const StartQuiz = () => {
   const startQuizMutation = useMutation({
     mutationFn: startQuiz,
     onSuccess: (data) => {
-      console.log("data",data)
+      console.log("quiz data",data)
       if (data?.status && Array.isArray(data?.questions)) {
         localStorage.setItem('quizData', JSON.stringify(data.questions));
         localStorage.setItem('timeZone', data.timeZone);

@@ -20,30 +20,30 @@ router.get('/logout', EjsAuthCheck, AdminController.logout)
 router.get("/dashboard", EjsAuthCheck, AdminController.dashboard)
 
 //question admin route
-router.get('/question/list', AdminController.listQuestionPage)
+router.get('/question/list',EjsAuthCheck, AdminController.listQuestionPage)
 
-router.get('/question/add', AdminController.addQuestionPage)
+router.get('/question/add',EjsAuthCheck, AdminController.addQuestionPage)
 
-router.post('/question/create', QuestionController.createQuestion)
+router.post('/question/create',EjsAuthCheck, QuestionController.createQuestion)
 
-router.get('/question/:id/edit', AdminController.editQuestionPage)
+router.get('/question/:id/edit',EjsAuthCheck, AdminController.editQuestionPage)
 
 router.put('/question/update/:id', QuestionController.updateQuestion)
 
-router.delete('/question/delete/:id', QuestionController.deleteQuestion)
+router.delete('/question/delete/:id',EjsAuthCheck, QuestionController.deleteQuestion)
 
 //category admin route
-router.get('/category/list', AdminController.listCategoryPage)
+router.get('/category/list',EjsAuthCheck, AdminController.listCategoryPage)
 
-router.post('/category/create', CategoryController.createCategory)
+router.post('/category/create',EjsAuthCheck, CategoryController.createCategory)
 
-router.get('/category/add', AdminController.addCategoryPage)
+router.get('/category/add',EjsAuthCheck, AdminController.addCategoryPage)
 
-router.get('/category/:id/edit', AdminController.editCategory)
+router.get('/category/:id/edit',EjsAuthCheck, AdminController.editCategory)
 
-router.put('/category/update/:id', CategoryController.updateCategory)
+router.put('/category/update/:id',EjsAuthCheck, CategoryController.updateCategory)
 
-router.delete('/category/delete/:id', CategoryController.deleteCategory)
+router.delete('/category/delete/:id',EjsAuthCheck, CategoryController.deleteCategory)
 
 // //users route
 // /**
@@ -67,10 +67,10 @@ router.delete('/category/delete/:id', CategoryController.deleteCategory)
 //  *         description: Data fetched successfully
 //  */
 
-router.get('/user/list', AdminController.getUsersList)
+router.get('/user/list',EjsAuthCheck, AdminController.getUsersList)
 
-router.delete('/user/:userId', AdminController.softDelete)
+router.delete('/user/:userId',EjsAuthCheck, AdminController.softDelete)
 
-router.get('/user/score', AdminController.getUserScoresByCategory)
+router.get('/user/score',EjsAuthCheck, AdminController.getUserScoresByCategory)
 
 module.exports = router

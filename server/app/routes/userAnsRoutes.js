@@ -71,16 +71,16 @@ router.post('/answer/create',AuthCheck,UserAndAnswerController.createAnswer)
  *           type: string
  *         description: Your authentication token
  *     requestBody:
- *       required: false
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             properties:
- *               categoryId:
+ *               categoryName:
  *                 type: string
- *                 description: ID of the quiz category (optional)
- *                 example: "64d8ca18e42b9a12f8e3c456"
+ *                 description: Name of the quiz category
+ *                 example: "JavaScript"
  *               timeZone:
  *                 type: string
  *                 description: User's time zone
@@ -93,7 +93,6 @@ router.post('/answer/create',AuthCheck,UserAndAnswerController.createAnswer)
  *       '500':
  *         description: Server error
  */
-
 
 // /api//quiz/start
 router.post('/quiz/start', AuthCheck,UserAndAnswerController.quizStart)
@@ -150,5 +149,7 @@ router.post('/quiz/start', AuthCheck,UserAndAnswerController.quizStart)
  */
 //  /api//quiz/result
 router.get('/quiz/result',AuthCheck,UserAndAnswerController.getQuizResults)
+
+router.get('/categories',AuthCheck,CategoryController.getAllCategory)
 
 module.exports=router
