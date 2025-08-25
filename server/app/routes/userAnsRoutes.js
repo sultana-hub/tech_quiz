@@ -9,9 +9,15 @@ const router=express.Router()
  * /api/answer/create:
  *   post:
  *     summary: Submit an answer to a quiz question
- *     tags: [Quiz]
- *     security:
- *       - xAccessToken: []
+ *     tags:
+ *       - Quiz
+ *     parameters:
+ *       - in: header
+ *         name: x-access-token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Your authentication token
  *     requestBody:
  *       required: true
  *       content:
@@ -36,15 +42,16 @@ const router=express.Router()
  *                 description: User's time zone
  *                 example: "Asia/Kolkata"
  *     responses:
- *       200:
+ *       '200':
  *         description: Answer submitted successfully
- *       400:
+ *       '400':
  *         description: Invalid input
- *       401:
+ *       '401':
  *         description: Unauthorized (missing or invalid token)
- *       500:
+ *       '500':
  *         description: Server error
  */
+
 
 //      /api//answer/create
 router.post('/answer/create',AuthCheck,UserAndAnswerController.createAnswer)
@@ -54,9 +61,15 @@ router.post('/answer/create',AuthCheck,UserAndAnswerController.createAnswer)
  * /api/quiz/start:
  *   post:
  *     summary: Start a quiz session
- *     tags: [Quiz]
- *     security:
- *       - xAccessToken: []
+ *     tags:
+ *       - Quiz
+ *     parameters:
+ *       - in: header
+ *         name: x-access-token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Your authentication token
  *     requestBody:
  *       required: false
  *       content:
@@ -68,65 +81,39 @@ router.post('/answer/create',AuthCheck,UserAndAnswerController.createAnswer)
  *                 type: string
  *                 description: ID of the quiz category (optional)
  *                 example: "64d8ca18e42b9a12f8e3c456"
+ *               timeZone:
+ *                 type: string
+ *                 description: User's time zone
+ *                 example: "Asia/Kolkata"
  *     responses:
- *       200:
+ *       '200':
  *         description: Quiz started successfully (returns questions)
- *       401:
+ *       '401':
  *         description: Unauthorized
- *       500:
+ *       '500':
  *         description: Server error
  */
+
+
 // /api//quiz/start
 router.post('/quiz/start', AuthCheck,UserAndAnswerController.quizStart)
-
-/**
- * @swagger
- * /api/categories:
- *   get:
- *     summary: Get all quiz categories
- *     tags: [Quiz]
- *     security:
- *       - xAccessToken: []
- *     responses:
- *       200:
- *         description: List of categories
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   _id:
- *                     type: string
- *                     example: "64d8cb77e42b9a12f8e3c789"
- *                   categoryName:
- *                     type: string
- *                     example: "JavaScript"
- *                   createdAt:
- *                     type: string
- *                     format: date-time
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Server error
- */
-
-//  /api//categories
-router.get('/categories',AuthCheck,CategoryController.getAllCategory)
-
-
 
 /**
  * @swagger
  * /api/quiz/result:
  *   get:
  *     summary: Get quiz results of logged-in user
- *     tags: [Quiz]
- *     security:
- *       - xAccessToken: []
+ *     tags:
+ *       - Quiz
+ *     parameters:
+ *       - in: header
+ *         name: x-access-token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Your authentication token
  *     responses:
- *       200:
+ *       '200':
  *         description: Quiz results retrieved successfully
  *         content:
  *           application/json:
@@ -156,9 +143,9 @@ router.get('/categories',AuthCheck,CategoryController.getAllCategory)
  *                       submittedAt:
  *                         type: string
  *                         format: date-time
- *       401:
+ *       '401':
  *         description: Unauthorized
- *       500:
+ *       '500':
  *         description: Server error
  */
 //  /api//quiz/result
