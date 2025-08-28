@@ -7,6 +7,7 @@ const transporter = require('../config/EmailConfig')
 const OtpModel = require('../model/otpModel')
 const bcrypt = require('bcryptjs')
 const mongoose = require('mongoose');
+const logger=require('../helper/logger')
 class UsersAuthController {
 
     //for register
@@ -24,6 +25,7 @@ class UsersAuthController {
             // Validate user input
             const { error } = userValidation.validate(userData);
             if (error) {
+                logger.error("error occured", error);
                 return res.status(httpStatusCode.BadRequest).json({
                     status: false,
                     message: error.message
@@ -73,6 +75,7 @@ class UsersAuthController {
             });
 
         } catch (error) {
+            logger.error("error occured", error);
             console.log('Register Error:', error);
             return res.status(httpStatusCode.InternalServerError).json({
                 status: false,
@@ -136,6 +139,7 @@ class UsersAuthController {
             return res.status(200).json({ status: true, message: "Email verified successfully" });
 
         } catch (error) {
+            logger.error("error occured", error);
             console.error(error);
             return res.status(500).json({ status: false, message: "Unable to verify email, please try again later" });
         }
@@ -182,6 +186,7 @@ class UsersAuthController {
             });
 
         } catch (error) {
+            logger.error("error occured", error);
             console.error("Resend OTP error:", error);
             return res.status(500).json({
                 status: false,
@@ -254,6 +259,7 @@ class UsersAuthController {
 
 
         } catch (error) {
+            logger.error("error occured", error);
             console.log(error);
 
         }
@@ -270,6 +276,7 @@ class UsersAuthController {
             })
 
         } catch (error) {
+            logger.error("error occured", error);
             console.log(error);
 
         }
@@ -315,6 +322,7 @@ class UsersAuthController {
             });
 
         } catch (error) {
+            logger.error("error occured", error);
             console.error("Get Profile Error:", error);
             return res.status(httpStatusCode.InternalServerError).json({
                 status: false,
@@ -383,6 +391,7 @@ class UsersAuthController {
             });
 
         } catch (error) {
+            logger.error("error occured", error);
             console.error("Profile Update Error:", error);
             return res.status(httpStatusCode.InternalServerError).json({
                 status: false,
@@ -426,6 +435,7 @@ class UsersAuthController {
             }
 
         } catch (err) {
+            logger.error("error occured", err);
             console.log(err);
         }
     }
@@ -466,6 +476,7 @@ class UsersAuthController {
             res.status(200).json({ status: true, message: "Password reset email sent. Please check your email." });
 
         } catch (error) {
+            logger.error("error occured", error);
             console.log(error);
             res.status(500).json({ status: false, message: "Unable to send password reset email. Please try again later." });
 
@@ -539,6 +550,7 @@ class UsersAuthController {
 
             res.status(200).json({ status: true, message: "Password updated successfully" });
         } catch (err) {
+            logger.error("error occured", error);
             console.error("Change password error:", err.message);
             res.status(500).json({ status: false, message: "Something went wrong" });
         }

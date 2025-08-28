@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 });
 
 
-app.use(rateLimitMiddleware);
+// app.use(rateLimitMiddleware);
 
 app.use(session({
   secret: 'myquizsecret',

@@ -4,6 +4,7 @@ const CategoryModel = require("../model/category");
 const fs = require('fs').promises
 const path = require('path')
 const mongoose = require('mongoose')
+const logger=require('../helper/logger')
 class CategoryController {
 
     async createCategory(req, res) {
@@ -31,6 +32,7 @@ class CategoryController {
             const data = await categoryData.save();
             return res.redirect(`/category/list`);
         } catch (error) {
+             logger.error("error occured", error);
             return res.status(httpStatusCode.InternalServerError).json({
                 status: false,
                 message: error.message
@@ -61,6 +63,7 @@ class CategoryController {
             });
 
         } catch (error) {
+             logger.error("error occured", error);
             console.error('Error fetching categories:', error);
             return res.status(500).json({
                 success: false,
@@ -118,6 +121,7 @@ class CategoryController {
             res.redirect('/category/list');
 
         } catch (error) {
+             logger.error("error occured", error);
             console.error("Update error:", error.message);
             res.redirect(`/category/${id}/edit`);
         }
@@ -150,6 +154,7 @@ class CategoryController {
                 message: "Category deleted successfully"
             });
         } catch (error) {
+             logger.error("error occured", error);
             return res.status(httpStatusCode.InternalServerError).json({
                 status: false,
                 message: error.message

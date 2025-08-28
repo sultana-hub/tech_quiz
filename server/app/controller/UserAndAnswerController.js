@@ -4,6 +4,7 @@ const { answerValidation } = require('../helper/validation');
 const httpStatusCode = require('../helper/httpStatusCode')
 const { ObjectId } = require('mongoose').Types;
 const mongoose = require('mongoose');
+const logger=require('../helper/logger')
 class UserAndAnswerController {
 
   // creating answer
@@ -115,6 +116,7 @@ class UserAndAnswerController {
       });
 
     } catch (err) {
+   logger.error("error occured", error);
       console.error("createAnswer error:", err);
       return res.status(500).json({ status: false, message: "Server error" });
     }
@@ -207,6 +209,7 @@ class UserAndAnswerController {
       // });
 
     } catch (error) {
+      logger.error("error occured", error);
       return res.status(500).json({
         status: false,
         message: error.message
@@ -372,6 +375,7 @@ class UserAndAnswerController {
 
       return res.status(200).json(results);
     } catch (err) {
+      logger.error("error occured", err);
       console.error('Error fetching user quiz answers:', err);
       return res.status(500).json({ error: 'Failed to fetch quiz answers' });
     }
@@ -445,6 +449,7 @@ getQuizResults = async (req, res) => {
       data: results
     });
   } catch (error) {
+    logger.error("error occured", error);
     console.error("Error fetching quiz results:", error);
     res.status(500).json({ message: error.message });
   }

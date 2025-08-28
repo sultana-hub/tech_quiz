@@ -12,7 +12,7 @@ import { green, red } from '@mui/material/colors';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { fetchQuizResults } from '../../components/quiz/quizQuery'
-
+import DownloadResultButton from "./DownloadResultButton";
 
 
 const QuizResult = () => {
@@ -75,91 +75,106 @@ const QuizResult = () => {
     const subjectCorrect = currentQuestions.filter((q) => q.isCorrect).length;
     const subjectPercentage = Math.round((subjectCorrect / currentQuestions.length) * 100);
 
+
+    const resultData = {
+        subject: currentCategory,
+        userName: sessionStorage.getItem("name"),
+        score: subjectPercentage + '%',
+
+    };
+
+
     return (
-        <section className="container">
-            <Box p={4}>
-                <Typography variant="h4" gutterBottom>
-                    🧮 Quiz Result Summary
-                </Typography>
-
-                <Box mb={3}>
-                    <Typography variant="h6">Total Questions: {currentQuestions.length}</Typography>
-                    <Typography variant="h6" color="success.main">
-                        Correct Answers: {subjectCorrect}
-                    </Typography>
-                    <Typography variant="h6">
-                        Score: {subjectCorrect}/{currentQuestions.length} ({subjectPercentage}%)
-                    </Typography>
-                </Box>
-
-                <Divider sx={{ mb: 3 }} />
-
-                <Box mb={3}>
-                    <Typography variant="h5" gutterBottom color="primary">
-                        📘 Subject: {currentCategory}
-                    </Typography>
-                    <Typography variant="body1" mb={2}>
-                        {subjectCorrect}/{currentQuestions.length} correct ({subjectPercentage}%)
+        <>
+            <div style={{ display: "flex", justifyContent:"right", marginTop: 30 ,marginRight:15}}>
+                <DownloadResultButton result={resultData} />
+            </div>
+            <section className="container">
+                <Box p={4}>
+                    <Typography variant="h4" gutterBottom>
+                        🧮 Quiz Result Summary
                     </Typography>
 
-                    <Grid container spacing={3}>
-                        {currentQuestions.map((q, index) => (
-                            <Grid item xs={12} md={6} key={index}>
-                                <Paper elevation={3} sx={{ p: 2 }}>
-                                    <Typography variant="subtitle1" fontWeight="bold">
-                                        {index + 1}. {q.question}
-                                    </Typography>
-
-                                    <Typography mt={1}>
-                                        <strong>Your Answer:</strong>{' '}
-                                        <Chip
-                                            label={q.selectedAnswer}
-                                            sx={{
-                                                bgcolor: q.isCorrect ? green[100] : red[100],
-                                                color: q.isCorrect ? green[800] : red[800],
-                                                fontWeight: 'bold',
-                                            }}
-                                        />
-                                    </Typography>
-
-                                    {!q.isCorrect && (
-                                        <Typography mt={1}>
-                                            <strong>Correct Answer:</strong>{' '}
-                                            <Chip label={q.correctAnswer} color="success" />
-                                        </Typography>
-                                    )}
-
-                                    <Typography mt={1} variant="body2" color="textSecondary">
-                                        Submitted at: {new Date(q.submittedAt).toLocaleString()}
-                                    </Typography>
-                                </Paper>
-                            </Grid>
-                        ))}
-                    </Grid>
-
-                    {/* Subject-level Pagination */}
-                    <Box mt={4} display="flex" justifyContent="space-between">
-                        <Button
-                            variant="outlined"
-                            disabled={subjectPage === 0}
-                            onClick={() => setSubjectPage((prev) => prev - 1)}
-                        >
-                            ◀️ Previous Subject
-                        </Button>
-                        <Typography variant="body1">
-                            Subject {subjectPage + 1} of {categories.length}
+                    <Box mb={3}>
+                        <Typography variant="h6">Total Questions: {currentQuestions.length}</Typography>
+                        <Typography variant="h6" color="success.main">
+                            Correct Answers: {subjectCorrect}
                         </Typography>
-                        <Button
-                            variant="outlined"
-                            disabled={subjectPage === categories.length - 1}
-                            onClick={() => setSubjectPage((prev) => prev + 1)}
-                        >
-                            Next Subject ▶️
-                        </Button>
+                        <Typography variant="h6">
+                            Score: {subjectCorrect}/{currentQuestions.length} ({subjectPercentage}%)
+                        </Typography>
+                    </Box>
+
+                    <Divider sx={{ mb: 3 }} />
+
+                    <Box mb={3}>
+                        <Typography variant="h5" gutterBottom color="primary">
+                            📘 Subject: {currentCategory}
+                        </Typography>
+                        <Typography variant="body1" mb={2}>
+                            {subjectCorrect}/{currentQuestions.length} correct ({subjectPercentage}%)
+                        </Typography>
+
+                        <Grid container spacing={3}>
+                            {currentQuestions.map((q, index) => (
+                                <Grid item xs={12} md={6} key={index}>
+                                    <Paper elevation={3} sx={{ p: 2 }}>
+                                        <Typography variant="subtitle1" fontWeight="bold">
+                                            {index + 1}. {q.question}
+                                        </Typography>
+
+                                        <Typography mt={1}>
+                                            <strong>Your Answer:</strong>{' '}
+                                            <Chip
+                                                label={q.selectedAnswer}
+                                                sx={{
+                                                    bgcolor: q.isCorrect ? green[100] : red[100],
+                                                    color: q.isCorrect ? green[800] : red[800],
+                                                    fontWeight: 'bold',
+                                                }}
+                                            />
+                                        </Typography>
+
+                                        {!q.isCorrect && (
+                                            <Typography mt={1}>
+                                                <strong>Correct Answer:</strong>{' '}
+                                                <Chip label={q.correctAnswer} color="success" />
+                                            </Typography>
+                                        )}
+
+                                        <Typography mt={1} variant="body2" color="textSecondary">
+                                            Submitted at: {new Date(q.submittedAt).toLocaleString()}
+                                        </Typography>
+                                    </Paper>
+                                </Grid>
+                            ))}
+                        </Grid>
+
+                        {/* Subject-level Pagination */}
+                        <Box mt={4} display="flex" justifyContent="space-between">
+                            <Button
+                                variant="outlined"
+                                disabled={subjectPage === 0}
+                                onClick={() => setSubjectPage((prev) => prev - 1)}
+                            >
+                                ◀️ Previous Subject
+                            </Button>
+                            <Typography variant="body1">
+                                Subject {subjectPage + 1} of {categories.length}
+                            </Typography>
+                            <Button
+                                variant="outlined"
+                                disabled={subjectPage === categories.length - 1}
+                                onClick={() => setSubjectPage((prev) => prev + 1)}
+                            >
+                                Next Subject ▶️
+                            </Button>
+                        </Box>
                     </Box>
                 </Box>
-            </Box>
-        </section>
+            </section>
+        </>
+
     );
 };
 

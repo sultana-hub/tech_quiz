@@ -2,7 +2,7 @@ const QuestionModel = require('../model/question');
 const CategoryModel = require('../model/category');
 const mongoose = require('mongoose')
 const { questionValidation } = require('../helper/validation')
-
+const logger=require('../helper/logger')
 
 class QuestionController {
 
@@ -45,6 +45,7 @@ class QuestionController {
             //     data: newQuestion
             // });
         } catch (error) {
+             logger.error("error occured", error);
             console.error("Question creation error:", error);
             return res.status(500).json({
                 status: false,
@@ -77,8 +78,9 @@ class QuestionController {
             );
 
             res.redirect("/question/list"); // redirect back to list
-        } catch (err) {
-            console.error("Error updating question:", err);
+        } catch (error) {
+             logger.error("error occured", error);
+            console.error("Error updating question:", error);
             res.status(500).send("Internal Server Error");
         }
     }

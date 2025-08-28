@@ -5,6 +5,7 @@ const { UserModel, loginValidation } = require('../model/user')
 const mongoose = require('mongoose')
 const { hashedPassword, comparePassword } = require("../middleware/auth");
 const jwt = require('jsonwebtoken')
+const logger=require('../helper/logger')
 class AdminController {
 
   async ejsAuthCheck(req, res, next) {
@@ -21,12 +22,13 @@ class AdminController {
 
   async loginpage(req, res) {
     try {
-      const message = req.flash('message', "Welcome to login page !");
+      const message = req.flash('message');
       res.render('login', {
         title: "Login",
         message
       });
     } catch (error) {
+       logger.error("error occured", error);
       console.error(error);
       req.flash('message', "Internal server error");
       res.redirect('/');
@@ -55,6 +57,12 @@ class AdminController {
         req.flash('message', "Invalid password");
         return res.redirect('/');
       }
+
+    if (user.isAdmin !== 'admin') {
+                req.flash('message', "Please login with admin credentials");
+                return res.redirect('/');
+            }
+
 
       //  Access Token (short expiry)
       const accessToken = jwt.sign(
@@ -85,6 +93,7 @@ class AdminController {
       return res.redirect("/dashboard");
 
     } catch (err) {
+       logger.error("error occured", error);
       console.error(" Login error:", err);
       req.flash("message", "Internal server error");
       return res.redirect("/");
@@ -100,6 +109,7 @@ class AdminController {
         res.redirect("/?message=Logged out successfully");
       });
     } catch (error) {
+       logger.error("error occured", error);
       console.error("Logout error:", error);
       res.redirect("/?error=Something went wrong");
     }
@@ -123,6 +133,7 @@ class AdminController {
         category:category.length
       });
     } catch (error) {
+       logger.error("error occured", error);
       console.error("Dashboard error:", error);
       req.flash("error", "Failed to load dashboard");
       return res.redirect("/");
@@ -145,6 +156,7 @@ class AdminController {
 
       })
     } catch (error) {
+       logger.error("error occured", error);
       console.log("errorr in showing question list", error)
       res.status(httpStatusCode.InternalServerError).send(error)
     }
@@ -206,6 +218,7 @@ class AdminController {
         categories: allCategories
       });
     } catch (err) {
+       logger.error("error occured", error);
       console.error("Error fetching question with lookup:", err);
       res.status(500).send("Server error");
     }
@@ -368,6 +381,7 @@ class AdminController {
       console.log("score result", results)
       res.render("userScore/score", { title: "Scores", results });
     } catch (err) {
+       logger.error("error occured", error);
       console.error("Error fetching user scores:", err);
       res.status(500).send("Server Error", err.message);
     }
