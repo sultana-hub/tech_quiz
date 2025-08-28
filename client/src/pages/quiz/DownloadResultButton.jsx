@@ -18,7 +18,8 @@ const DownloadResultButton = ({ result }) => {
         // Title
         doc.setFont("helvetica", "bold");
         doc.setFontSize(28);
-        doc.text("Certificate of Achievement", doc.internal.pageSize.getWidth() / 2, 100, { align: "center" });
+        doc.setTextColor(255, 0, 0); // RGB (red)
+        doc.text("Certificate of Achievement", doc.internal.pageSize.getWidth() / 2, 100, { align: "center"});
 
         // Subtitle
         doc.setFont("times", "italic");
@@ -28,13 +29,15 @@ const DownloadResultButton = ({ result }) => {
         // Student Name
         doc.setFont("times", "bold");
         doc.setFontSize(24);
-        doc.text(result.userName, doc.internal.pageSize.getWidth() / 2, 200, { align: "center" });
+        doc.setTextColor(0, 0, 255); // RGB (blue)
+        doc.text(result.userName, doc.internal.pageSize.getWidth() / 2, 200, { align: "center",color:"blue" });
 
         // Achievement text
         doc.setFont("times", "normal");
         doc.setFontSize(16);
+          
         doc.text(
-            `has successfully completed the quiz on ${result.subject} with a score of ${result.score}`,
+            `has successfully completed the quiz on * ${result.subject}  with a score of =${result.score}`,
             doc.internal.pageSize.getWidth() / 2,
             250,
             { align: "center", maxWidth: 700 }
