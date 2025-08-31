@@ -136,7 +136,7 @@ const QuizResult = () => {
                                         </Typography>
 
                                         {!q.isCorrect && (
-                                            <Typography mt={1}>
+                                            <Typography mt={1} component="span">
                                                 <strong>Correct Answer:</strong>{' '}
                                                 <Chip label={q.correctAnswer} color="success" />
                                             </Typography>

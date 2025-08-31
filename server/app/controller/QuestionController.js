@@ -8,7 +8,7 @@ class QuestionController {
 
     async createQuestion(req, res) {
         console.log("Received categories from frontend:", req.body.category);
-        const { question, options, correctAnswer, category } = req.body;
+        let { question, options, correctAnswer, category } = req.body;
         // Trim whitespace from answers
         if (correctAnswer) correctAnswer = correctAnswer.trim()
         if (options && Array.isArray(options)) options = options.map(opt => opt.trim());

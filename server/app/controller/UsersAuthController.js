@@ -8,81 +8,86 @@ const OtpModel = require('../model/otpModel')
 const bcrypt = require('bcryptjs')
 const mongoose = require('mongoose');
 const logger=require('../helper/logger')
+const axios=require( "axios");
 class UsersAuthController {
 
     //for register
-    async register(req, res) {
-        try {
-            const { userName, email, password } = req.body;
+ 
 
-            const userData = {
-                userName, // match with Joi schema (change if needed)
-                email,
-                password,
-                profilePic: req.file ? req.file.path : null
-            };
+async register(req, res) {
+    try {
+        const { userName, email, password, captchaToken } = req.body;
 
-            // Validate user input
-            const { error } = userValidation.validate(userData);
-            if (error) {
-                logger.error("error occured", error);
-                return res.status(httpStatusCode.BadRequest).json({
-                    status: false,
-                    message: error.message
-                });
-            }
+        // 1️ Verify reCAPTCHA first
+        const captchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`;
+        const captchaRes = await axios.post(captchaVerifyUrl);
 
-            // Check for duplicate email
-            // const isExistingUser = await UserModel.findOne({ email });
-            const userWithEmail = await UserModel.aggregate([
-                {
-                    $match: {
-                        email: req.body.email
-                    }
-                },
-                {
-                    $limit: 1
-                }
-            ])
-            const isExistingUser = userWithEmail[0]
-            if (isExistingUser) {
-                return res.status(httpStatusCode.Conflict).json({
-                    status: false,
-                    message: "Email already exists"
-                });
-            }
-
-            // Hash the password (assuming async function)
-            const hashed = await hashedPassword(password);
-
-            // Create and save user
-            const user = new UserModel({
-                userName,
-                email,
-                password: hashed,
-                profilePic: userData.profilePic
+        if (!captchaRes.data.success) {
+            return res.status(400).json({
+                status: false,
+                message: "Failed captcha verification"
             });
+        }
 
-            const data = await user.save();
+        // 2️ Continue with your existing logic
+        const userData = {
+            userName,
+            email,
+            password,
+            profilePic: req.file ? req.file.path : null
+        };
 
-            // Send email verification (if async)
-            await sendEmailVerificationOTP(req, user);
-
-            return res.status(httpStatusCode.Create).json({
-                status: true,
-                message: "User created successfully. OTP sent to your email.",
-                data
-            });
-
-        } catch (error) {
-            logger.error("error occured", error);
-            console.log('Register Error:', error);
-            return res.status(httpStatusCode.InternalServerError).json({
+        // Joi validation
+        const { error } = userValidation.validate(userData);
+        if (error) {
+            return res.status(400).json({
                 status: false,
                 message: error.message
             });
         }
+
+        // Check duplicate email
+        const userWithEmail = await UserModel.aggregate([
+            { $match: { email } },
+            { $limit: 1 }
+        ]);
+        const isExistingUser = userWithEmail[0];
+        if (isExistingUser) {
+            return res.status(409).json({
+                status: false,
+                message: "Email already exists"
+            });
+        }
+
+        // Hash password
+        const hashed = await hashedPassword(password);
+
+        // Save user
+        const user = new UserModel({
+            userName,
+            email,
+            password: hashed,
+            profilePic: userData.profilePic
+        });
+        const data = await user.save();
+
+        // Send OTP
+        await sendEmailVerificationOTP(req, user);
+
+        return res.status(201).json({
+            status: true,
+            message: "User created successfully. OTP sent to your email.",
+            data
+        });
+    } catch (error) {
+        console.error("Register Error:", error);
+        return res.status(500).json({
+            status: false,
+            message: error.message
+        });
     }
+}
+
 
 
 
@@ -200,7 +205,19 @@ class UsersAuthController {
     //login
     async login(req, res) {
         try {
-            const { email, password } = req.body
+            const { email, password ,captchaToken} = req.body
+
+       // 1️ Verify reCAPTCHA first
+        const captchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`;
+        const captchaRes = await axios.post(captchaVerifyUrl);
+
+        if (!captchaRes.data.success) {
+            return res.status(400).json({
+                status: false,
+                message: "Failed captcha verification"
+            });
+        }
+
 
             const loginData = { email, password }
 

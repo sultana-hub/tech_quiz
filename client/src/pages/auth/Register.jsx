@@ -1,222 +1,3 @@
-// import React, { useState } from 'react';
-// import { useForm } from 'react-hook-form';
-// import { useMutation } from '@tanstack/react-query';
-// import { userRegister } from '../../components/Auth/query';
-// import { useNavigate } from 'react-router-dom';
-// import Swal from 'sweetalert2'
-// import {
-//   Container,
-//   Button,
-//   Typography,
-//   TextField,
-//   Box,
-//   IconButton,
-//   InputAdornment
-// } from "@mui/material";
-// import { BorderAll, Visibility, VisibilityOff } from "@mui/icons-material";
-// const Register = () => {
-//   const navigate = useNavigate();
-
-//   const [showPassword, setShowPassword] = useState(false);
-//   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-//   const {
-//     register,
-//     handleSubmit,
-//     watch,
-//     reset,
-//     formState: { errors },
-//   } = useForm();
-
-//   const { mutate, isPending, isSuccess, isError } = useMutation({
-//     mutationFn: userRegister,
-//     onSuccess: () => {
-//       Swal.fire({
-//         title: "Good job!",
-//         text: "You registered successfully!",
-//         icon: "success"
-//       });
-//       navigate('/otp'); // redirect after successful registration
-//     },
-//     onError: () => {
-//       Swal.fire({
-//         icon: "error",
-//         title: "Oops...",
-//         text: "Something went wrong!",
-
-//       });
-
-//     }
-//   });
-
-//   const onSubmit = (data) => {
-
-//     if (data.password !== data.confirmPassword) {
-//       alert('Passwords do not match!');
-//       return;
-//     }
-//     if (!data.profilePic) {
-//       alert('profile picture required')
-//       return
-//     }
-//     // If avatar file is uploaded
-
-//     const formData = new FormData();
-//     formData.append('userName', data.userName);
-//     formData.append('email', data.email);
-//     formData.append('password', data.password);
-//     formData.append('profilePic', data.profilePic[0]);
-//     mutate(formData); // Send as multipart/form-data
-
-//     reset();
-//   };
-
-
-//   return (
-//     <>
-
-//       <Container maxWidth="md" sx={{ Border: "4px solid blue" }}>
-//         <Box sx={{ mt: 5, mb: 3, p: 3, boxShadow: 3, borderRadius: 2, bgcolor: "white", marginBottom: "90px", paddingTop: "20px" }}>
-//           <Typography variant="h5" align="center" gutterBottom color="primary">
-//             Devloper  Registration
-//           </Typography>
-//           <form onSubmit={handleSubmit(onSubmit)} id="regisForm" noValidate sx={{ Border: "4px solid blue" }}>
-//             <div className="form-group">
-//               <TextField
-//                 fullWidth
-//                 label="Name"
-//                 name="userName"
-//                 variant="outlined"
-//                 margin="normal"
-//                 {...register("userName", { required: "Name is required" })}
-//               // error={!!errors.userName}
-//               // // You can also use the helperText prop on TextField
-//               // helperText={errors.userName ? errors.userName.message : ''}
-//               />
-//               {errors.name && <p className="text-danger">{errors.userName.message}</p>}
-//             </div>
-
-
-
-//             <div className="form-group">
-//               <TextField
-//                 fullWidth
-//                 label="Email"
-//                 name="email"
-//                 type="email"
-//                 variant="outlined"
-//                 margin="normal"
-//                 {...register("email", { required: "Email is required" })}
-//               // error={!!errors.email}
-//               // helperText={errors.email ? errors.email.message : ''}
-//               />
-
-//               {errors.email && <p className="text-danger">{errors.email.message}</p>}
-//             </div>
-//             <div className="form-group">
-//               <TextField
-//                 fullWidth
-//                 label="Password"
-//                 name="password"
-//                 type={showPassword ? "text" : "password"}
-//                 variant="outlined"
-//                 margin="normal"
-//                 autoComplete="new-password"
-
-//                 {...register("password", {
-//                   required: "Password is required",
-//                   minLength: { value: 4, message: "Minimum 4 characters required" },
-//                 })}
-
-//                 InputProps={{
-//                   endAdornment: (
-//                     <InputAdornment position="end">
-//                       <IconButton onClick={() => setShowPassword(!showPassword)}>
-//                         {showPassword ? <VisibilityOff /> : <Visibility />}
-//                       </IconButton>
-//                     </InputAdornment>
-//                   ),
-//                 }}
-//               // error={!!errors.password}
-//               // helperText={errors.password ? errors.password.message : ''}
-//               />
-//               {errors.password && <p className="text-danger">{errors.password.message}</p>}
-//             </div>
-//             <div className="form-group">
-//               <TextField
-//                 fullWidth
-//                 label="Confirm Password"
-//                 name="confirmPassword"
-//                 type={showConfirmPassword ? "text" : "password"}
-//                 variant="outlined"
-//                 margin="normal"
-//                 {...register("confirmPassword", {
-//                   required: "Confirm Password is required",
-//                   validate: (val) =>
-//                     val === watch("password") || "Passwords do not match",
-//                 })}
-
-//                 autoComplete="new-password"
-//                 InputProps={{
-//                   endAdornment: (
-//                     <InputAdornment position="end">
-//                       <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-//                         {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-//                       </IconButton>
-//                     </InputAdornment>
-//                   ),
-//                 }}
-//               // error={!!errors.confirmPassword}
-//               // helperText={errors.confirmPassword ? errors.confirmPassword.message : ''}
-//               />
-//               {errors.confirmPassword && <p className="text-danger">{errors.confirmPassword.message}</p>}
-//             </div>
-
-
-//             <div className="form-group">
-//               <input
-//                 type="file"
-//                 {...register("profilePic", {
-//                   required: "Profile is required",
-//                 })}
-//                 accept="image/*"
-//                 className="form-control"
-//               // error={!!errors.profilePic}
-//               // helperText={errors.profilePic ? errors.profilePic.message : ''}
-//               />
-//               {errors.profilePic && <p className="text-danger">{errors.profilePic.message}</p>}
-
-//             </div>
-
-//             <Button
-//               type="submit"
-//               variant="contained"
-//               fullWidth
-//               disabled={isPending}
-//               sx={{
-//                 mt: 2,
-//                 borderRadius: "50px",
-//                 bgcolor: "#0b1948ff",
-//                 color: "white",
-//                 "&:hover": { bgcolor: "rgba(33, 13, 86, 1)" }
-//               }}
-//             >
-//               {isPending ? "Registering..." : "Register"}
-//             </Button>
-
-
-//           </form>
-//           <Box sx={{ textAlign: "center", mt: 2 }}>
-//             <Typography>
-//               Existing user? <Button onClick={() => navigate("/login")}>Login</Button>
-//             </Typography>
-//           </Box>
-//         </Box>
-//       </Container>
-//     </>
-//   );
-// };
-
-// export default Register;
 
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -235,9 +16,10 @@ import {
   Grid,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-
+import ReCAPTCHA from "react-google-recaptcha";
 const Register = () => {
   const navigate = useNavigate();
+  const [captchaToken, setCaptchaToken] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const {
@@ -284,15 +66,24 @@ const Register = () => {
       });
       return;
     }
+    if (!captchaToken) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Please complete the reCAPTCHA',
+      });
+      return;
+    }
     const formData = new FormData();
     formData.append('userName', data.userName);
     formData.append('email', data.email);
     formData.append('password', data.password);
     formData.append('profilePic', data.profilePic[0]);
+    formData.append('captchaToken', captchaToken); //  Send captcha token
     mutate(formData);
     reset();
   };
-// #6e45e2
+  // #6e45e2
   return (
     <Container
       maxWidth="100%"
@@ -301,7 +92,7 @@ const Register = () => {
         display: 'flex',
         justifyContent: 'center',
         minWidth: { md: '960px' },
-      
+
       }}
     >
       <Box
@@ -468,6 +259,11 @@ const Register = () => {
                     </Typography>
                   )}
                 </Box>
+
+                <ReCAPTCHA
+                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                  onChange={(token) => setCaptchaToken(token)}
+                />
                 <Button
                   type="submit"
                   variant="contained"
@@ -550,7 +346,7 @@ const Register = () => {
                   display: 'block',
                   visibility: 'visible',
                   zIndex: 2,
-                 
+
                 }}
                 onLoad={() => console.log('Image loaded successfully: /images/quiz1.svg')}
                 onError={() => console.log('Image failed to load: /images/quiz1.svg')}
