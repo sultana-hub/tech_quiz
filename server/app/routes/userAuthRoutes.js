@@ -40,6 +40,10 @@ const router = express.Router()
  *               profilePic:
  *                 type: string
  *                 format: binary
+ *               captcha:
+ *                 type: string
+ *                 description: Captcha token returned from client-side (e.g. Google reCAPTCHA)
+ *                 example: "test-token"
  *     responses:
  *       200:
  *         description: User registered successfully
@@ -93,7 +97,7 @@ router.post('/resend/otp', UserAuthController.resendOtp)
  * /api/user/login:
  *   post:
  *     summary: User login
- *     description: Authenticates a user and returns a JWT token.
+ *     description: Authenticates a user and returns a JWT token. Requires captcha verification.
  *     tags:
  *       - Users
  *     requestBody:
@@ -105,6 +109,7 @@ router.post('/resend/otp', UserAuthController.resendOtp)
  *             required:
  *               - email
  *               - password
+ *               - captcha
  *             properties:
  *               email:
  *                 type: string
@@ -112,14 +117,29 @@ router.post('/resend/otp', UserAuthController.resendOtp)
  *               password:
  *                 type: string
  *                 example: secret123
+ *               captcha:
+ *                 type: string
+ *                 description: Captcha token returned from client-side (e.g. Google reCAPTCHA)
+ *                 example: "test-token"
  *     responses:
  *       200:
  *         description: Login successful (JWT returned)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       400:
+ *         description: Failed captcha verification
  *       401:
  *         description: Invalid credentials
  *       500:
  *         description: Server error
  */
+
 
 router.post('/login', UserAuthController.login)
 
@@ -173,9 +193,13 @@ router.put('/reset-password/:id/:token', UserAuthController.resetPassword);
  *   get:
  *     summary: Get user profile
  *     tags: [Users]
- *     security:
- *       - bearerAuth: []
  *     parameters:
+ *       - in: header
+ *         name: x-access-token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Your authentication token
  *       - in: path
  *         name: userId
  *         required: true
@@ -198,14 +222,19 @@ router.get('/profile/:userId', AuthCheck, UserAuthController.getProfile)
  *   put:
  *     summary: Update user profile
  *     tags: [Users]
- *     security:
- *       - bearerAuth: []
  *     parameters:
+ *       - in: header
+ *         name: x-access-token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Your authentication token
  *       - in: path
  *         name: userId
  *         required: true
  *         schema:
  *           type: string
+ *         description: ID of the user to update
  *     requestBody:
  *       required: true
  *       content:
@@ -225,10 +254,11 @@ router.get('/profile/:userId', AuthCheck, UserAuthController.getProfile)
  *       400:
  *         description: Bad request
  *       401:
- *         description: Unauthorized
+ *         description: Unauthorized - Invalid or missing token
  *       500:
  *         description: Server error
  */
+
 
 router.put('/profile/:userId/update/', AuthCheck, userImageUpload.single('profilePic'), UserAuthController.profileUpdate)
 

@@ -56,6 +56,7 @@ class CategoryController {
             }
 
             // Successful response
+            // return res.redirect('/category/list')
             return res.status(200).json({
                 success: true,
                 message: 'Categories retrieved successfully',
@@ -149,10 +150,8 @@ class CategoryController {
             // Step 2: Proceeding to delete
             await CategoryModel.deleteOne({ _id: id });
 
-            return res.status(httpStatusCode.Ok).json({
-                status: true,
-                message: "Category deleted successfully"
-            });
+            return res.redirect('/category/list')
+            
         } catch (error) {
              logger.error("error occured", error);
             return res.status(httpStatusCode.InternalServerError).json({

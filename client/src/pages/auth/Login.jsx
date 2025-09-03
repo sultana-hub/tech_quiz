@@ -126,7 +126,7 @@ const Login = () => {
           >
             <Box sx={{ width: '100%' }}>
               <Typography variant="h5" align="center" color="primary" gutterBottom>
-                Developer Login
+                Tech Login
               </Typography>
               <form onSubmit={handleSubmit(onSubmit)} noValidate>
                 <TextField

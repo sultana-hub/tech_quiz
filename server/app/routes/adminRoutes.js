@@ -45,12 +45,12 @@ router.put('/category/update/:id',EjsAuthCheck, CategoryController.updateCategor
 
 router.delete('/category/delete/:id',EjsAuthCheck, CategoryController.deleteCategory)
 
-// //users route
 // /**
 //  * @swagger
 //  * /user/list:
 //  *   get:
 //  *     summary: Get all the users from Database
+//  *     description: Returns a list of all users from the database (Admin access required).
 //  *     tags:
 //  *       - Users
 //  *     parameters:
@@ -60,16 +60,39 @@ router.delete('/category/delete/:id',EjsAuthCheck, CategoryController.deleteCate
 //  *         schema:
 //  *           type: string
 //  *         description: Your authentication token
-//  *     produces:
-//  *       - application/json
 //  *     responses:
-//  *       '200':
+//  *       200:
 //  *         description: Data fetched successfully
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: array
+//  *               items:
+//  *                 type: object
+//  *                 properties:
+//  *                   id:
+//  *                     type: string
+//  *                     example: 64b1f5d2c8a7c23df8b5c123
+//  *                   userName:
+//  *                     type: string
+//  *                     example: John Doe
+//  *                   email:
+//  *                     type: string
+//  *                     example: john@example.com
+//  *                   profilePic:
+//  *                     type: string
+//  *                     format: uri
+//  *                     example: https://example.com/uploads/profile/johndoe.png
+//  *       401:
+//  *         description: Unauthorized - Invalid or missing token
+//  *       500:
+//  *         description: Internal server error
 //  */
+
 
 router.get('/user/list',EjsAuthCheck, AdminController.getUsersList)
 
-router.delete('/user/:userId',EjsAuthCheck, AdminController.softDelete)
+router.delete('/user/delete/:userId',EjsAuthCheck, AdminController.softDelete)
 
 router.get('/user/score',EjsAuthCheck, AdminController.getUserScoresByCategory)
 

@@ -1,92 +1,92 @@
 const httpStatusCode = require("../helper/httpStatusCode");
 const sendEmailVerificationOTP = require("../helper/sendOtpVerify");
 const { hashedPassword, comparePassword } = require("../middleware/auth");
-const { UserModel, userValidation, loginValidation } = require("../model/user");
+const { UserModel, userValidation, loginValidation, passwordValidation } = require("../model/user");
 const jwt = require('jsonwebtoken')
 const transporter = require('../config/EmailConfig')
 const OtpModel = require('../model/otpModel')
 const bcrypt = require('bcryptjs')
 const mongoose = require('mongoose');
-const logger=require('../helper/logger')
-const axios=require( "axios");
+const logger = require('../helper/logger')
+const axios = require("axios");
 class UsersAuthController {
 
     //for register
- 
 
-async register(req, res) {
-    try {
-        const { userName, email, password, captchaToken } = req.body;
 
-        // 1️ Verify reCAPTCHA first
-        const captchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`;
-        const captchaRes = await axios.post(captchaVerifyUrl);
+    async register(req, res) {
+        try {
+            const { userName, email, password, captchaToken } = req.body;
 
-        if (!captchaRes.data.success) {
-            return res.status(400).json({
-                status: false,
-                message: "Failed captcha verification"
+            // 1️ Verify reCAPTCHA first
+            const captchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`;
+            const captchaRes = await axios.post(captchaVerifyUrl);
+
+            if (!captchaRes.data.success) {
+                return res.status(400).json({
+                    status: false,
+                    message: "Failed captcha verification"
+                });
+            }
+
+            // 2️ Continue with your existing logic
+            const userData = {
+                userName,
+                email,
+                password,
+                profilePic: req.file ? req.file.path : null
+            };
+
+            // Joi validation
+            const { error } = userValidation.validate(userData);
+            if (error) {
+                return res.status(400).json({
+                    status: false,
+                    message: error.message
+                });
+            }
+
+            // Check duplicate email
+            const userWithEmail = await UserModel.aggregate([
+                { $match: { email } },
+                { $limit: 1 }
+            ]);
+            const isExistingUser = userWithEmail[0];
+            if (isExistingUser) {
+                return res.status(409).json({
+                    status: false,
+                    message: "Email already exists"
+                });
+            }
+
+            // Hash password
+            const hashed = await hashedPassword(password);
+
+            // Save user
+            const user = new UserModel({
+                userName,
+                email,
+                password: hashed,
+                profilePic: userData.profilePic
             });
-        }
+            const data = await user.save();
 
-        // 2️ Continue with your existing logic
-        const userData = {
-            userName,
-            email,
-            password,
-            profilePic: req.file ? req.file.path : null
-        };
+            // Send OTP
+            await sendEmailVerificationOTP(req, user);
 
-        // Joi validation
-        const { error } = userValidation.validate(userData);
-        if (error) {
-            return res.status(400).json({
+            return res.status(201).json({
+                status: true,
+                message: "User created successfully. OTP sent to your email.",
+                data
+            });
+        } catch (error) {
+            console.error("Register Error:", error);
+            return res.status(500).json({
                 status: false,
                 message: error.message
             });
         }
-
-        // Check duplicate email
-        const userWithEmail = await UserModel.aggregate([
-            { $match: { email } },
-            { $limit: 1 }
-        ]);
-        const isExistingUser = userWithEmail[0];
-        if (isExistingUser) {
-            return res.status(409).json({
-                status: false,
-                message: "Email already exists"
-            });
-        }
-
-        // Hash password
-        const hashed = await hashedPassword(password);
-
-        // Save user
-        const user = new UserModel({
-            userName,
-            email,
-            password: hashed,
-            profilePic: userData.profilePic
-        });
-        const data = await user.save();
-
-        // Send OTP
-        await sendEmailVerificationOTP(req, user);
-
-        return res.status(201).json({
-            status: true,
-            message: "User created successfully. OTP sent to your email.",
-            data
-        });
-    } catch (error) {
-        console.error("Register Error:", error);
-        return res.status(500).json({
-            status: false,
-            message: error.message
-        });
     }
-}
 
 
 
@@ -205,18 +205,18 @@ async register(req, res) {
     //login
     async login(req, res) {
         try {
-            const { email, password ,captchaToken} = req.body
+            const { email, password, captchaToken } = req.body
 
-       // 1️ Verify reCAPTCHA first
-        const captchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`;
-        const captchaRes = await axios.post(captchaVerifyUrl);
+            // 1️ Verify reCAPTCHA first
+            const captchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`;
+            const captchaRes = await axios.post(captchaVerifyUrl);
 
-        if (!captchaRes.data.success) {
-            return res.status(400).json({
-                status: false,
-                message: "Failed captcha verification"
-            });
-        }
+            if (!captchaRes.data.success) {
+                return res.status(400).json({
+                    status: false,
+                    message: "Failed captcha verification"
+                });
+            }
 
 
             const loginData = { email, password }
@@ -425,37 +425,55 @@ async register(req, res) {
     /**update password  not using this*/
     async updatePassword(req, res) {
         try {
-            const user_id = req.body.user_id;
-            const { password } = req.body;
+            const { user_id, password } = req.body;
+
+            // Check if password is provided
             if (!password) {
                 return res.status(400).json({
+                    status: false,
                     message: 'Password is required'
                 });
             }
-            const userdata = await UserModel.findOne({ _id: user_id });
-            if (userdata) {
-                const newPassword = await hashedPassword(password);
-                const updateuser = await UserModel.findOneAndUpdate({ _id: user_id },
-                    {
-                        $set: {
-                            password: newPassword
-                        }
-                    });
-                res.status(200).json({
-                    message: 'Password updated successfully',
 
-                });
-            } else {
-                res.status(400).json({
-                    message: 'password not updated'
+            // Joi validation
+            const { error } = passwordValidation.validate({ password });
+            if (error) {
+                return res.status(400).json({
+                    status: false,
+                    message: error.message
                 });
             }
 
+            // Find user
+            const userdata = await UserModel.findOne({ _id: user_id });
+            if (!userdata) {
+                return res.status(404).json({
+                    status: false,
+                    message: 'User not found'
+                });
+            }
+
+            // Hash and update password
+            const newPassword = await hashedPassword(password);
+            await UserModel.findOneAndUpdate(
+                { _id: user_id },
+                { $set: { password: newPassword } }
+            );
+
+            return res.status(200).json({
+                status: true,
+                message: 'Password updated successfully'
+            });
+
         } catch (err) {
-            logger.error("error occured", err);
-            console.log(err);
+            console.error("Update Password Error:", err);
+            return res.status(500).json({
+                status: false,
+                message: 'Internal Server Error'
+            });
         }
     }
+
 
 
     //reset password link
@@ -485,7 +503,7 @@ async register(req, res) {
                        <p>Hello ${user.userName},</p>
                        <p>Please <a href="${resetLink}">click here</a> to reset your password.</p>
                        <p>Or copy and paste this link in your browser:</p>
-                       <p><a href="${resetLink}">${resetLink}</a></p>
+                       <p ><a  href="${resetLink}"   style="color: blue !important; text-decoration: underline !important;">${resetLink}</a></p>
                     `
 
             });
@@ -506,6 +524,16 @@ async register(req, res) {
 
         try {
             const { password, confirm_password } = req.body;
+
+            // Joi validation
+            const { error } = passwordValidation.validate({ password });
+            if (error) {
+                return res.status(400).json({
+                    status: false,
+                    message: error.message
+                });
+            }
+
             const { id, token } = req.params;
             const user = await UserModel.findById(id);
             if (!user) {
@@ -515,8 +543,8 @@ async register(req, res) {
             const new_secret = user._id + process.env.WT_SECRET_KEY;
             jwt.verify(token, new_secret);
 
-            if (!password || !confirm_password) {
-                return res.status(400).json({ status: false, message: "New Password and Confirm New Password are required" });
+            if (!confirm_password) {
+                return res.status(400).json({ status: false, message: " Confirm  Password is required" });
             }
 
             if (password !== confirm_password) {
@@ -544,6 +572,24 @@ async register(req, res) {
             const userId = req.user._id; // comes from auth middleware (JWT in headers)
             const { currentPassword, newPassword, confirmPassword } = req.body;
 
+            // check all fields present
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                return res.status(400).json({
+                    status: false,
+                    message: "All fields are required"
+                });
+            }
+
+            // Joi validation should apply to newPassword
+            const { error } = passwordValidation.validate({ password: newPassword });
+            if (error) {
+                return res.status(400).json({
+                    status: false,
+                    message: error.message
+                });
+            }
+
+
             const user = await UserModel.findById(userId);
             if (!user) {
                 return res.status(404).json({ status: false, message: "User not found" });
@@ -557,7 +603,7 @@ async register(req, res) {
 
             // confirm match
             if (newPassword !== confirmPassword) {
-                return res.status(400).json({ status: false, message: "Passwords do not match" });
+                return res.status(400).json({ status: false, message: "New Passwords and Confirm Password do not match" });
             }
 
             // hash and save

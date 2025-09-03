@@ -144,7 +144,7 @@ const Register = () => {
                   letterSpacing: '1px',
                 }}
               >
-                Developer Registration
+                Tech Registration
               </Typography>
               <form onSubmit={handleSubmit(onSubmit)} noValidate>
                 <TextField
@@ -192,7 +192,10 @@ const Register = () => {
                   autoComplete="new-password"
                   {...register('password', {
                     required: 'Password is required',
-                    minLength: { value: 4, message: 'Minimum 4 characters required' },
+                    pattern: {
+                      value: /^(?=.*[a-zA-Z0-9])(?=.*[^a-zA-Z0-9]).{8,}$/,
+                      message: 'Password must be at least 8 characters long , alphanumeric , and at least one special character',
+                    },
                   })}
                   error={!!errors.password}
                   helperText={errors.password?.message}

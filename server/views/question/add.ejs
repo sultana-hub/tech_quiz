@@ -62,6 +62,20 @@
                                 <div class="card-body">
 
                                     <form action="/question/create" method="POST">
+                                          <!-- Categories (multi-select) -->
+                                        <div class="form-group mt-3">
+                                            <label for="categoryName">Select Categories *</label>
+                                            <select name="category[]" id="categoryName" class="form-control" multiple
+                                                required>
+                                                <% category.forEach(cat=> { %>
+                                                    <option value="<%= cat._id %>">
+                                                        <%= cat.categoryName %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select>
+                                            <small class="form-text text-muted">Hold Ctrl or Cmd to select multiple
+                                                categories.</small>
+                                        </div>
 
                                         <!-- Question -->
                                         <div class="form-group">
@@ -86,20 +100,7 @@
                                                 id="correctAnswer" required />
                                         </div>
 
-                                        <!-- Categories (multi-select) -->
-                                        <div class="form-group mt-3">
-                                            <label for="categoryName">Select Categories *</label>
-                                            <select name="category[]" id="categoryName" class="form-control" multiple
-                                                required>
-                                                <% category.forEach(cat=> { %>
-                                                    <option value="<%= cat._id %>">
-                                                        <%= cat.categoryName %>
-                                                    </option>
-                                                    <% }) %>
-                                            </select>
-                                            <small class="form-text text-muted">Hold Ctrl or Cmd to select multiple
-                                                categories.</small>
-                                        </div>
+                                      
 
                                         <button type="submit" class="btn btn-primary mt-4">Create Question</button>
                                     </form>

@@ -5,7 +5,8 @@ const { UserModel, loginValidation } = require('../model/user')
 const mongoose = require('mongoose')
 const { hashedPassword, comparePassword } = require("../middleware/auth");
 const jwt = require('jsonwebtoken')
-const logger=require('../helper/logger')
+const logger = require('../helper/logger')
+const axios = require('axios')
 class AdminController {
 
   async ejsAuthCheck(req, res, next) {
@@ -28,7 +29,7 @@ class AdminController {
         message
       });
     } catch (error) {
-       logger.error("error occured", error);
+      logger.error("error occured", error);
       console.error(error);
       req.flash('message', "Internal server error");
       res.redirect('/');
@@ -40,46 +41,59 @@ class AdminController {
 
   async login(req, res) {
     try {
-      const { error, value } = loginValidation.validate(req.body);
-      if (error) {
-        req.flash('message', error.details[0].message);
-        return res.redirect('/');
+      const { email, password, "g-recaptcha-response": captcha } = req.body;
+
+      // 1️⃣ Check captcha exists
+      if (!captcha) {
+        req.flash("message", "Please complete the captcha");
+        return res.redirect("/");
       }
 
+      // 2️⃣ Verify captcha with Google
+      const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+      const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${captcha}`;
+
+      const { data } = await axios.post(verifyUrl);
+      if (!data.success) {
+        req.flash("message", "Captcha verification failed");
+        return res.redirect("/");
+      }
+
+      // 3️⃣ Validate login fields (allow unknown so captcha is ignored)
+      const { error, value } = loginValidation.validate(req.body, { allowUnknown: true });
+      if (error) {
+        req.flash("message", error.details[0].message);
+        return res.redirect("/");
+      }
+
+      // 4 Find user
       const user = await UserModel.findOne({ email: value.email });
       if (!user) {
-        req.flash('message', "User not found");
-        return res.redirect('/');
+        req.flash("message", "User not found");
+        return res.redirect("/");
       }
 
+      // 5️ Check password
       const isMatch = await comparePassword(value.password, user.password);
       if (!isMatch) {
-        req.flash('message', "Invalid password");
-        return res.redirect('/');
+        req.flash("message", "Invalid password");
+        return res.redirect("/");
       }
 
-    if (user.isAdmin !== 'admin') {
-                req.flash('message', "Please login with admin credentials");
-                return res.redirect('/');
-            }
+      // 6️ Check admin role
+      if (user.isAdmin !== "admin") {
+        req.flash("message", "Please login with admin credentials");
+        return res.redirect("/");
+      }
 
-
-      //  Access Token (short expiry)
+      // 7️ Generate JWT token
       const accessToken = jwt.sign(
-        {
-          _id: user._id,
-          userName: user.userName,
-          email: user.email,
-
-        },
+        { _id: user._id, userName: user.userName, email: user.email },
         process.env.JWT_SECRET_KEY,
-        { expiresIn: "15m" } // short lived
+        { expiresIn: "15m" }
       );
 
-      
-      await user.save();
-
-      //  Set cookies
+      // 8️⃣ Set cookie
       res.cookie("usertoken", accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -87,14 +101,12 @@ class AdminController {
         maxAge: 15 * 60 * 1000 // 15 minutes
       });
 
-  
-
+      // 9️⃣ Redirect to dashboard with success message
       req.flash("message", "Welcome admin!");
       return res.redirect("/dashboard");
 
     } catch (err) {
-       logger.error("error occured", error);
-      console.error(" Login error:", err);
+      console.error("Login error:", err);
       req.flash("message", "Internal server error");
       return res.redirect("/");
     }
@@ -109,7 +121,7 @@ class AdminController {
         res.redirect("/?message=Logged out successfully");
       });
     } catch (error) {
-       logger.error("error occured", error);
+      logger.error("error occured", error);
       console.error("Logout error:", error);
       res.redirect("/?error=Something went wrong");
     }
@@ -120,8 +132,10 @@ class AdminController {
     try {
       //Logged-in user comes from JWT (middleware attached req.user)
       const loggedInUser = req.user;
-       const questions=await QuestionModel.find()
-       const category=await CategoryModel.find()
+      const questions = await QuestionModel.find()
+      const category = await CategoryModel.find()
+      const users=await UserModel.find()
+      const deletedUser=await UserModel.find({isDeleted:true})
       //  Use flash for dynamic message
       req.flash("success", `Welcome to ${loggedInUser.userName} dashboard`);
 
@@ -129,11 +143,13 @@ class AdminController {
         title: `${loggedInUser.userName} Dashboard`,
         user: loggedInUser,   // only logged-in user
         message: req.flash("success"),
-        questions:questions.length,
-        category:category.length
+        questions: questions.length,
+        category: category.length,
+        users:users.length,
+        deletedUser:deletedUser.length
       });
     } catch (error) {
-       logger.error("error occured", error);
+      logger.error("error occured", error);
       console.error("Dashboard error:", error);
       req.flash("error", "Failed to load dashboard");
       return res.redirect("/");
@@ -156,7 +172,7 @@ class AdminController {
 
       })
     } catch (error) {
-       logger.error("error occured", error);
+      logger.error("error occured", error);
       console.log("errorr in showing question list", error)
       res.status(httpStatusCode.InternalServerError).send(error)
     }
@@ -218,7 +234,7 @@ class AdminController {
         categories: allCategories
       });
     } catch (err) {
-       logger.error("error occured", error);
+      logger.error("error occured", error);
       console.error("Error fetching question with lookup:", err);
       res.status(500).send("Server error");
     }
@@ -381,7 +397,7 @@ class AdminController {
       console.log("score result", results)
       res.render("userScore/score", { title: "Scores", results });
     } catch (err) {
-       logger.error("error occured", error);
+      logger.error("error occured", err);
       console.error("Error fetching user scores:", err);
       res.status(500).send("Server Error", err.message);
     }
@@ -389,8 +405,43 @@ class AdminController {
 
 
   async softDelete(req, res) {
+    try {
 
+      console.log("softDelete called, params:", req.params);
+      const userId = req.params.userId;
+      console.log("Deleting userId:", userId);
+      // check if user exists
+      const user = await UserModel.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({
+          status: false,
+          message: "User not found!"
+        });
+      }
+
+      // soft delete (set isDeleted true)
+      const deletedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        { isDeleted: true },
+        { new: true } // return updated doc
+      );
+      console.log("Soft deleted user:", deletedUser);
+      return res.redirect('/user/list')
+      // return res.status(200).json({
+      //   status: true,
+      //   message: "User soft deleted successfully",
+      //   data: deletedUser
+      // });
+    } catch (error) {
+      logger.error("Error in deleting user", error);
+      return res.status(500).json({
+        status: false,
+        message: "Internal Server Error"
+      });
+    }
   }
+
 
 
 }

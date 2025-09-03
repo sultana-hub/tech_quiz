@@ -62,8 +62,8 @@ const DownloadResultButton = ({ result }) => {
     doc.text(`with a score of ${result.score}`, pageWidth / 2, 310, { align: "center" });
 
     // Date
-    doc.setFontSize(14);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 100, 370);
+    // doc.setFontSize(14);
+    // doc.text(`Date: ${new Date().toLocaleDateString()}`, 100, 370);
 
     // Signature line
     doc.line(pageWidth - 250, 360, pageWidth - 80, 360);
@@ -76,6 +76,11 @@ const DownloadResultButton = ({ result }) => {
     doc.setFont("times", "normal");
     doc.setFontSize(14);
     doc.text("Authorized Signature", pageWidth - 165, 380, { align: "center" });
+
+      // Date below signature
+    doc.setFontSize(12);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - 165, 400, { align: "center" });
+
 
     // Footer
     doc.setFontSize(12);
