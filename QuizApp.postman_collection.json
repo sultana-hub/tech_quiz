@@ -1,0 +1,292 @@
+{
+	"info": {
+		"_postman_id": "ac09087b-ca02-432d-99b3-3756cdbe8d7b",
+		"name": "QuizApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14898919"
+	},
+	"item": [
+		{
+			"name": "user/login",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODlhYmY0ZGNmYzk2ZWY3ZjY2NzgxNjciLCJ1c2VyTmFtZSI6IkljeSIsImVtYWlsIjoiaWN5QHlvcG1haWwuY29tIiwiaWF0IjoxNzU0OTc0NjEwLCJleHAiOjE3NTQ5ODE4MTB9.flYRfB1keES5FDndqRcdHlN-GKcaJXsy1pE6UJMbbIM",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"icy@yopmail.com\",\r\n    \"password\":\"abcd\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2001/api/user/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2001",
+					"path": [
+						"api",
+						"user",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "quiz/start",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODlhYmY0ZGNmYzk2ZWY3ZjY2NzgxNjciLCJ1c2VyTmFtZSI6IkljeSIsImVtYWlsIjoiaWN5QHlvcG1haWwuY29tIiwiaWF0IjoxNzU0OTc1MzExLCJleHAiOjE3NTQ5ODI1MTF9.hULdW718K5KIl4FKumMuKrjqgeiud_WvKbepc6AE6ro",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"timeZone\": \"Asia/Kolkata\",\r\n  \"categoryName\":\"React.js\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2001/api/quiz/start",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2001",
+					"path": [
+						"api",
+						"quiz",
+						"start"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "answer/create",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODhiM2Y1Y2ZhNGMwMTRjYjYyZWMxMzkiLCJ1c2VyTmFtZSI6IkljeTEyIiwiZW1haWwiOiJpY3lAeW9wbWFpbC5jb20iLCJpYXQiOjE3NTQxMzg4NjUsImV4cCI6MTc1NDE0NjA2NX0.Uawa8LnzYWVz6xsLRbwMxkMCKAtTGVuF8XnGw3dQl-4",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"questionId\": \"688d6b6116cb5a6ecbce6da3\",\r\n  \"selectedAnswer\": \"flux\",\r\n  \"timeZone\": \"Asia/Kolkata\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2001/api/answer/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2001",
+					"path": [
+						"api",
+						"answer",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "quiz/result",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODhiM2Y1Y2ZhNGMwMTRjYjYyZWMxMzkiLCJ1c2VyTmFtZSI6IkljeTEyIiwiZW1haWwiOiJpY3lAeW9wbWFpbC5jb20iLCJpYXQiOjE3NTQyMzI1NDEsImV4cCI6MTc1NDIzOTc0MX0.F7RZPUwd7g5N8zt9Y7C8Tj_2bbVK0VRd9YN3uEtllKY",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:2001/api/quiz/result",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2001",
+					"path": [
+						"api",
+						"quiz",
+						"result"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user/score",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:2001/user/score",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2001",
+					"path": [
+						"user",
+						"score"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:2001/api/user/register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "userName",
+							"value": "Yahya12",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "yahya12@yopmail.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "0324@Yahya",
+							"type": "text"
+						},
+						{
+							"key": "profilePic",
+							"type": "file",
+							"src": "/C:/Users/cst_s/OneDrive/Pictures/images/raj.jpg"
+						},
+						{
+							"key": "captchaToken",
+							"value": "test-token",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:2001/api/user/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2001",
+					"path": [
+						"api",
+						"user",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user/verify/email",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"yahya@yopmail.com\",\r\n    \"otp\":7704\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2001/api/user/verify/email",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2001",
+					"path": [
+						"api",
+						"user",
+						"verify",
+						"email"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update-password",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODlhYmY0ZGNmYzk2ZWY3ZjY2NzgxNjciLCJ1c2VyTmFtZSI6IkljeSIsImVtYWlsIjoiaWN5QHlvcG1haWwuY29tIiwiaWF0IjoxNzU2NzI4MDgyLCJleHAiOjE3NTY3MzUyODJ9.L_WPQv1gj9xpqYm1ptvmHr_Az7aYCHj4F14cPpH1kig",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"currentPassword\":\"abcd\",\r\n    \"newPassword\":\"0324@Yahya\",\r\n    \"confirmPassword\":\"0324@Yahya\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:2001/api/user/update-password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2001",
+					"path": [
+						"api",
+						"user",
+						"update-password"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

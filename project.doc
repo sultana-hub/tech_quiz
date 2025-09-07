@@ -1,0 +1,25 @@
+
+
+
+
+admin credentials:email:: john@gmail.com
+                   password:: 0324@Yahya
+
+registered user credential:   email:: icy@yopmail.com
+                              password:: 0324@Yahya    
+
+
+                              add question 
+
+q:
+Which command is used to start a MongoDB server?
+
+options:
+1)mongod start
+2)mongo start
+3)start mongod
+4)run mongod    
+
+swagger api url
+
+/api-docs
