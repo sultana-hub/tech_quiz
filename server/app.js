@@ -60,7 +60,7 @@ app.use ('/api/user',userAuthRoues)
 //admin route
 const adminRoute = require('./app/routes/adminRoutes')
 app.use( adminRoute)
-const port=2001
+const port=process.env.PORT||2001
 
 app.listen(port,()=>{
     // console.log("😊😀sever is running at port:",port)
