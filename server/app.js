@@ -19,11 +19,33 @@ const cookieParser = require("cookie-parser");
 
 dbCon()
 const app=express()
-app.use(cors({
-  origin: ["https://parveen-tech-quiz.vercel.app/"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
-}));
+
+
+// ✅ Explicit CORS config
+const allowedOrigins = [
+  "https://parveen-tech-quiz.vercel.app",  // frontend on Vercel
+  "http://localhost:5173"                  // local frontend (Vite)
+]
+
+
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
+// ✅ Handle preflight (important for login requests)
+app.options("*", cors());
 
 
 // Fix CSP here
