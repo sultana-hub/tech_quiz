@@ -20,7 +20,7 @@ const cors = require("cors");
 dbCon()
 const app=express()
 app.use(cors({
-  origin: ["http://localhost:5173", "https://parveen-tech-quiz.vercel.app/"],
+  origin: ["https://parveen-tech-quiz.vercel.app/"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
