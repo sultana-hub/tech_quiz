@@ -16,11 +16,12 @@ const rateLimitMiddleware = require('./app/helper/realLimit');
 const logger=require('./app/helper/logger')
 const flash = require('connect-flash');
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 dbCon()
 const app=express()
 app.use(cors({
   origin: ["http://localhost:5173", "https://parveen-tech-quiz.vercel.app/"],
-  methods: ["GET", "POST"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 
