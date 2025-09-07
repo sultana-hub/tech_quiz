@@ -18,7 +18,11 @@ const flash = require('connect-flash');
 const cookieParser = require("cookie-parser");
 dbCon()
 const app=express()
-app.use(cors())
+app.use(cors({
+  origin: ["http://localhost:5173", "https://parveen-tech-quiz.vercel.app/"],
+  methods: ["GET", "POST"],
+  credentials: true
+}));
 
 
 // Fix CSP here
