@@ -4,7 +4,7 @@ const { answerValidation } = require('../helper/validation');
 const httpStatusCode = require('../helper/httpStatusCode')
 const { ObjectId } = require('mongoose').Types;
 const mongoose = require('mongoose');
-const logger=require('../helper/logger')
+const logger = require('../helper/logger')
 class UserAndAnswerController {
 
   // creating answer
@@ -116,7 +116,7 @@ class UserAndAnswerController {
       });
 
     } catch (err) {
-   logger.error("error occured", error);
+      logger.error("error occured", error);
       console.error("createAnswer error:", err);
       return res.status(500).json({ status: false, message: "Server error" });
     }
@@ -415,45 +415,45 @@ class UserAndAnswerController {
   // };
 
 
-getQuizResults = async (req, res) => {
-  try {
-    const userId = req.user._id;
+  getQuizResults = async (req, res) => {
+    try {
+      const userId = req.user._id;
 
-    // Fetch only questions where this user has answered
-    const questions = await QuestionModel.find({
-      "answers.userId": userId
-    }).populate("categoryIds", "categoryName");
+      // Fetch only questions where this user has answered
+      const questions = await QuestionModel.find({
+        "answers.userId": userId
+      }).populate("categoryIds", "categoryName");
 
-    // Map results only for answered questions
-    const results = questions.map((q) => {
-      const userAnswer = q.answers.find(a => a.userId.toString() === userId.toString());
+      // Map results only for answered questions
+      const results = questions.map((q) => {
+        const userAnswer = q.answers.find(a => a.userId.toString() === userId.toString());
 
-      return {
-        questionId: q._id,
-        question: q.question,
-        categoryName: q.categoryIds?.[0]?.categoryName || "Unknown",
-        correctAnswer: q.correctAnswer,
-        selectedAnswer: userAnswer?.selectedAnswer || "Not Attempted",
-        isCorrect: userAnswer?.selectedAnswer
-          ? userAnswer.selectedAnswer === q.correctAnswer
-          : false,
-        score: userAnswer?.selectedAnswer
-          ? (userAnswer.selectedAnswer === q.correctAnswer ? 1 : 0)
-          : 0,
-        submittedAt: userAnswer?.submittedAt || null
-      };
-    });
+        return {
+          questionId: q._id,
+          question: q.question,
+          categoryName: q.categoryIds?.[0]?.categoryName || "Unknown",
+          correctAnswer: q.correctAnswer,
+          selectedAnswer: userAnswer?.selectedAnswer || "Not Attempted",
+          isCorrect: userAnswer?.selectedAnswer
+            ? userAnswer.selectedAnswer === q.correctAnswer
+            : false,
+          score: userAnswer?.selectedAnswer
+            ? (userAnswer.selectedAnswer === q.correctAnswer ? 1 : 0)
+            : 0,
+          submittedAt: userAnswer?.submittedAt || null
+        };
+      });
 
-    return res.status(200).json({
-      message: "Results fetched",
-      data: results
-    });
-  } catch (error) {
-    logger.error("error occured", error);
-    console.error("Error fetching quiz results:", error);
-    res.status(500).json({ message: error.message });
-  }
-};
+      return res.status(200).json({
+        message: "Results fetched",
+        data: results
+      });
+    } catch (error) {
+      logger.error("error occured", error);
+      console.error("Error fetching quiz results:", error);
+      res.status(500).json({ message: error.message });
+    }
+  };
 
 
 

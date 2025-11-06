@@ -21,15 +21,27 @@ dbCon()
 const app=express()
 
 
-// --- CORS setup (Render-safe) ---
+
+// --- CORS setup (local + Render-safe) ---
 const allowedOrigins = [
-  "https://parveen-tech-quiz.vercel.app"
+  "https://parveen-tech-quiz.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:2001", 
+  "https://tech-quiz-server.onrender.com"
 ];
 
 app.use(cors({
-  origin: allowedOrigins,  // only whitelist frontend domain
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `CORS error: The CORS policy does not allow access from origin ${origin}`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-   allowedHeaders: ["Content-Type", "Authorization", "x-access-token"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-access-token"],
   credentials: true
 }));
 
