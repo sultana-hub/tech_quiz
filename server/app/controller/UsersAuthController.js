@@ -206,7 +206,7 @@ class UsersAuthController {
     async login(req, res) {
         try {
             const { email, password, captchaToken } = req.body
-               console.log("Login request body:", req.body);
+             console.log("Login request body:", req.body);
             // 1️ Verify reCAPTCHA first
             const captchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`;
             const captchaRes = await axios.post(captchaVerifyUrl);
