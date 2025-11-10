@@ -1,8 +1,8 @@
 
 
-//  export const baseUrl = "http://localhost:2001/";
+//export const baseUrl = "http://localhost:2001/";
 
-export const baseUrl = "https://tech-quiz-server.onrender.com"
+ export const baseUrl = "https://tech-quiz-server.onrender.com"
 
 export const endPoints = {
   register: "api/user/register",
